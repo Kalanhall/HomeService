@@ -1,0 +1,6 @@
+framework module HomeService {
+  umbrella header "HomeService-umbrella.h"
+
+  export *
+  module * { export * }
+}

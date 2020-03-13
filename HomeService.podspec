@@ -28,15 +28,21 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/Kalanhall@163.com/HomeService.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
   s.source_files = 'HomeService/Classes/**/*'
   
-  # s.resource_bundles = {
-  #   'HomeService' => ['HomeService/Assets/*.png']
-  # }
+  s.resource_bundles = {
+    'HomeService' => ['HomeService/Assets/*']
+  }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'Extensions', '~> 1.0.0'
+  s.dependency 'KLProgressHUD', '~> 1.0.0'
+  s.dependency 'SnapKit'
+  s.dependency 'Alamofire'
+  s.dependency 'KLNavigationController'
+  s.dependency 'IQKeyboardManagerSwift'
 end

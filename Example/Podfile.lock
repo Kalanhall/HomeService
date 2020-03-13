@@ -1,0 +1,16 @@
+PODS:
+  - HomeService (0.1.0)
+
+DEPENDENCIES:
+  - HomeService (from `../`)
+
+EXTERNAL SOURCES:
+  HomeService:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  HomeService: 885d892296a68d398a2c7e47f3409450b6013b01
+
+PODFILE CHECKSUM: 6e249794224d4c4f4ef1a118a7b26f0316f84a08
+
+COCOAPODS: 1.8.3
