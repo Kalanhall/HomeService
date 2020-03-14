@@ -32,6 +32,7 @@ class HomeSpecialController: UIViewController, UITableViewDelegate, UITableViewD
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 50
         tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.description())
         return tableView
     } ()
@@ -39,12 +40,12 @@ class HomeSpecialController: UIViewController, UITableViewDelegate, UITableViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor.color(hexNumber: 0xF5F5F5)
+        navigationItem.titleView = UIImageView(image: UIImage.image(named: "title", in: Bundle(for: self.classForCoder)))
+        
         kl_barAlpha = 0
         kl_tintColor = .white
         kl_barStyle = .blackOpaque
-        kl_titleTextAttributes = [NSAttributedString.Key.foregroundColor : UIColor.white]
-        navigationItem.title = "每日特价"
         
         view.addSubview(topView)
         topView.snp_makeConstraints { (make) in
