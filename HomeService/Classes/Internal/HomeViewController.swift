@@ -11,8 +11,7 @@ import SnapKit
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     lazy var navigationBar = { () -> HomeNavigationBar in
-        let bar = HomeNavigationBar()
-        bar.backgroundColor = .red
+        let bar = HomeNavigationBar.navigationBar()
         return bar
     } ()
     
@@ -26,6 +25,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.separatorStyle = .none
         tableView.showsVerticalScrollIndicator = false
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.description())
+        if #available(iOS 11.0, *) {
+            tableView.contentInsetAdjustmentBehavior = .never
+        } else {
+            self.automaticallyAdjustsScrollViewInsets = false
+        }
         return tableView
     } ()
 
@@ -44,10 +48,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.leading.top.trailing.equalToSuperview()
         }
         
-        view.addSubview(tableView)
+        view.insertSubview(tableView, belowSubview: navigationBar)
         tableView.snp_makeConstraints { (make) in
-            make.leading.trailing.bottom.equalToSuperview()
-            make.top.equalTo(navigationBar.snp_bottom)
+            make.edges.equalToSuperview()
         }
     }
     
@@ -63,12 +66,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewCell.description()) as! UITableViewCell
         cell.backgroundColor = .clear
+        cell.textLabel!.text = "\(indexPath)"
         
         return cell
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        var offsetY = scrollView.contentOffset.y
-
+//        navigationBar.scrollDidScroll(scrollView)
     }
 }
