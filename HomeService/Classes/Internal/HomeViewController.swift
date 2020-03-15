@@ -11,8 +11,26 @@ import SnapKit
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     lazy var navigationBar = { () -> HomeNavigationBar in
-        let bar = HomeNavigationBar.navigationBar()
-        return bar
+        let view = HomeNavigationBar()
+        view.topView.image = UIImage.image(named: "navtop", in: Bundle(for: type(of: self)))
+        view.botView.image = UIImage.image(named: "navbot", in: Bundle(for: type(of: self)))
+        return view
+    } ()
+    
+    lazy var navigationFootter = { () -> UIImageView in
+        let view = UIImageView()
+        view.contentMode = .scaleToFill
+        view.clipsToBounds = true
+        view.image = UIImage.image(named: "navfootter", in: Bundle(for: type(of: self)))
+        return view
+    } ()
+    
+    lazy var advertView = { () -> UIImageView in
+        let view = UIImageView()
+        view.contentMode = .scaleToFill
+        view.image = UIImage.image(named: "advertView", in: Bundle(for: type(of: self)))
+        view.alpha = 0
+        return view
     } ()
     
     lazy var tableView = { () -> UITableView in
@@ -43,15 +61,33 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
 //        https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif
         
-        view.addSubview(navigationBar)
-        navigationBar.snp_makeConstraints { (make) in
-            make.leading.top.trailing.equalToSuperview()
-        }
+        let barH = EXTopBarHeight() + 41.0
         
-        view.insertSubview(tableView, belowSubview: navigationBar)
+        view.addSubview(tableView)
         tableView.snp_makeConstraints { (make) in
             make.edges.equalToSuperview()
         }
+        
+        view.addSubview(navigationBar)
+        navigationBar.snp_makeConstraints { (make) in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(barH)
+        }
+        
+        view.insertSubview(advertView, belowSubview: tableView)
+        advertView.snp_makeConstraints { (make) in
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(navigationBar.snp_bottom).inset(-100.auto())
+        }
+        
+        view.insertSubview(navigationFootter, belowSubview: tableView)
+        navigationFootter.snp_makeConstraints { (make) in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalTo(navigationBar.snp_bottom)
+        }
+        
+        tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
+        tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
     }
     
     @objc func push() {
@@ -72,6 +108,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        navigationBar.scrollDidScroll(scrollView)
+        // 自定义导航栏处理
+        navigationBar.scrollDidScroll(scrollView)
+        
+        // 导航栏下部背景图处理
+        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
+        navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY)
+        navigationFootter.alpha = navigationBar.alpha
+        
+        // 下拉广告图处理
+        advertView.alpha = 1 - navigationBar.alpha
+        if offsetY < 0 && fabs(offsetY) >= 60.0 {
+            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 60.0)
+        } else {
+            advertView.transform = .identity
+        }
     }
 }

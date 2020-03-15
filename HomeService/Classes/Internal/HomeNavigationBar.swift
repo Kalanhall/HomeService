@@ -12,21 +12,24 @@ class HomeNavigationBar: UIView {
     
     lazy var topView = { () -> UIImageView in
         let view = UIImageView()
-        view.contentMode = .scaleAspectFill
+        view.contentMode = .scaleToFill
         view.backgroundColor = .red
+        view.clipsToBounds = true
         return view
     } ()
     
     lazy var botView = { () -> UIImageView in
         let view = UIImageView()
-        view.contentMode = .scaleAspectFill
+        view.contentMode = .scaleToFill
         view.backgroundColor = .red
+        view.clipsToBounds = true
         return view
     } ()
     
     lazy var leftIcon = { () -> UIImageView in
         let view = UIImageView()
         view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
+        view.clipsToBounds = true
         return view
     } ()
     
@@ -88,8 +91,8 @@ class HomeNavigationBar: UIView {
         searchTextF.snp_makeConstraints { (make) in
             make.height.equalTo(30)
             make.leading.equalTo(10)
-            make.trailing.equalTo(-10)
             make.bottom.equalTo(-11)
+            make.trailing.equalToSuperview().inset(10)
         }
     }
     
@@ -97,24 +100,43 @@ class HomeNavigationBar: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    class func navigationBar() -> HomeNavigationBar {
-        return HomeNavigationBar(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.height, height: NSObject().EXTopBarHeight() + 41.0))
+    func scrollDidScroll(_ scrollView: UIScrollView) {
+        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
+        
+        if offsetY >= 0 {
+            // 上拉，变更布局
+            if offsetY >= botView.bounds.size.height {
+                offsetY = botView.bounds.size.height
+            }
+     
+            self.snp_updateConstraints { (make) in
+                make.height.equalTo(scrollView.contentInset.top - offsetY)
+            }
+            self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
+            
+            var space = (offsetY / botView.bounds.size.height * 80 * 2.5)
+            if space > 80.0 { space = 80.0 }
+            searchTextF.snp_updateConstraints { (make) in
+                make.trailing.equalToSuperview().inset(10 + space)
+            }
+            
+            leftIcon.alpha = 1 - offsetY / botView.bounds.size.height
+            self.alpha = 1
+            self.transform = .identity
+        } else {
+            // 下拉，还原布局
+            self.snp_updateConstraints { (make) in
+                make.height.equalTo(scrollView.contentInset.top)
+            }
+            self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
+            
+            searchTextF.snp_updateConstraints { (make) in
+                make.trailing.equalToSuperview().inset(10)
+            }
+            
+            leftIcon.alpha = 1
+            self.alpha = 1 + offsetY / botView.bounds.size.height
+            self.transform = CGAffineTransform(translationX: 0, y: -offsetY)
+        }
     }
-    
-//    func scrollDidScroll(_ scrollView: UIScrollView) {
-//        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
-//        if offsetY >= 0 {
-//            // 上拉
-//            if offsetY >= fabs(searchTextF.bounds.size.height - 44/*bar高度*/) * 0.5 + searchTextF.bounds.size.height {
-//                offsetY = fabs(searchTextF.bounds.size.height - 44/*bar高度*/) * 0.5 + searchTextF.bounds.size.height
-//            }
-//            searchTextF.transform = CGAffineTransform(translationX: 0, y: -offsetY)
-//            botView.transform = CGAffineTransform(translationX: 0, y: -offsetY)
-//        } else {
-//            // 下拉
-//            searchTextF.transform = .identity
-//            botView.transform = .identity
-//        }
-//        
-//    }
 }
