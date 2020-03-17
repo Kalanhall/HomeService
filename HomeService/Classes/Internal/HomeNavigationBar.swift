@@ -53,6 +53,12 @@ class HomeNavigationBar: UIView {
         view.layer.cornerRadius = 15
         return view
     } ()
+    
+    lazy var searchIcon = { () -> UIButton in
+        let view = UIButton(type: .custom)
+        view.setImage(UIImage.image(named: "searchIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        return view
+    } ()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -96,6 +102,10 @@ class HomeNavigationBar: UIView {
             make.bottom.equalTo(-11)
             make.trailing.equalToSuperview().inset(10)
         }
+        
+        searchIcon.frame = CGRect(x: 0, y: 0, width: 40, height: 30)
+        searchTextF.leftView = searchIcon
+        searchTextF.leftViewMode = .always
     }
     
     required init?(coder: NSCoder) {
@@ -141,9 +151,9 @@ class HomeNavigationBar: UIView {
                 make.bottom.equalTo(-11)
             }
             
-            var rate = offsetY / botView.bounds.size.height
             leftIcon.alpha = 1
-            self.alpha = 1 + rate * 2
+            var rate = offsetY / 30.0
+            self.alpha = 1 + rate
 //            self.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         }
     }
