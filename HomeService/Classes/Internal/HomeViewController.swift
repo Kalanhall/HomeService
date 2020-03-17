@@ -116,13 +116,13 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         // 导航栏下部背景图处理
         var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
-        navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY)
+//        navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         navigationFootter.alpha = navigationBar.alpha
         
-        // 下拉广告图处理
+        // 下拉广告图处理，> 50 才移动广告视图
         advertView.alpha = 1 - navigationBar.alpha
-        if offsetY < 0 && fabs(offsetY) >= 60.0 {
-            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 60.0)
+        if offsetY < 0 && fabs(offsetY) >= 50.0 {
+            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 50.0)
         } else {
             advertView.transform = .identity
         }

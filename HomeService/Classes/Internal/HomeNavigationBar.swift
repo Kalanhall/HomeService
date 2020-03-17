@@ -126,9 +126,9 @@ class HomeNavigationBar: UIView {
                 make.bottom.equalTo(-11 + margin)
             }
             
-            leftIcon.alpha = 1 - offsetY / botView.bounds.size.height
+            leftIcon.alpha = 1 - rate
             self.alpha = 1
-            self.transform = .identity
+//            self.transform = .identity
         } else {
             // 下拉，还原布局
             self.snp_updateConstraints { (make) in
@@ -141,12 +141,14 @@ class HomeNavigationBar: UIView {
                 make.bottom.equalTo(-11)
             }
             
+            var rate = offsetY / botView.bounds.size.height
             leftIcon.alpha = 1
-            self.alpha = 1 + offsetY / botView.bounds.size.height
-            self.transform = CGAffineTransform(translationX: 0, y: -offsetY)
+            self.alpha = 1 + rate * 2
+//            self.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         }
     }
     
+    /// 加载导航栏左侧图片，重新计算图片宽高
     func loadLeftIconImageWithURLString(_ url: String) {
         weak var wks = self
         leftIcon.kl_setImage(with: URL(string: url), placeholder: leftIcon.image, options: .progressiveBlur, completion: { (image, imageURL, type, stage, error) in
