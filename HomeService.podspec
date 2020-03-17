@@ -41,8 +41,9 @@ TODO: Add long description of the pod here.
   # s.dependency 'AFNetworking', '~> 2.3'
   s.dependency 'Extensions', '~> 1.0.0'
   s.dependency 'KLProgressHUD', '~> 1.0.0'
+  s.dependency 'KLNavigationController'
+  s.dependency 'KLImageView'
   s.dependency 'SnapKit'
   s.dependency 'Alamofire'
-  s.dependency 'KLNavigationController'
   s.dependency 'IQKeyboardManagerSwift'
 end

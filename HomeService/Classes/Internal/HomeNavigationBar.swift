@@ -7,28 +7,30 @@
 
 import UIKit
 import SnapKit
+import KLImageView
 
 class HomeNavigationBar: UIView {
     
-    lazy var topView = { () -> UIImageView in
-        let view = UIImageView()
+    lazy var topView = { () -> KLImageView in
+        let view = KLImageView()
         view.contentMode = .scaleToFill
         view.backgroundColor = .red
         view.clipsToBounds = true
         return view
     } ()
     
-    lazy var botView = { () -> UIImageView in
-        let view = UIImageView()
+    lazy var botView = { () -> KLImageView in
+        let view = KLImageView()
         view.contentMode = .scaleToFill
         view.backgroundColor = .red
         view.clipsToBounds = true
         return view
     } ()
     
-    lazy var leftIcon = { () -> UIImageView in
-        let view = UIImageView()
+    lazy var leftIcon = { () -> KLImageView in
+        let view = KLImageView()
         view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
+        view.contentMode = .scaleAspectFit
         view.clipsToBounds = true
         return view
     } ()
@@ -67,12 +69,6 @@ class HomeNavigationBar: UIView {
             make.height.equalTo(41/*搜索栏高度*/)
         }
         
-        topView.addSubview(leftIcon)
-        leftIcon.snp_makeConstraints { (make) in
-            make.leading.equalTo(10)
-            make.centerY.equalToSuperview().inset(EXStatusBarHeight() * 0.5)
-        }
-        
         topView.addSubview(msg)
         msg.snp_makeConstraints { (make) in
             make.trailing.equalTo(-5)
@@ -85,6 +81,12 @@ class HomeNavigationBar: UIView {
         scan.snp_makeConstraints { (make) in
             make.width.height.centerY.equalTo(msg)
             make.right.equalTo(msg.snp_left).inset(-6)
+        }
+        
+        topView.addSubview(leftIcon)
+        leftIcon.snp_makeConstraints { (make) in
+            make.leading.equalTo(10)
+            make.centerY.equalTo(msg.snp_centerY)
         }
         
         self.addSubview(searchTextF)
@@ -114,10 +116,14 @@ class HomeNavigationBar: UIView {
             }
             self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
             
-            var space = (offsetY / botView.bounds.size.height * 80 * 2.5)
+            var rate = offsetY / botView.bounds.size.height
+            var space = rate * 80 * 2.5
+            var margin = rate * 4 * 2.5
             if space > 80.0 { space = 80.0 }
+            if margin > 4.0 { margin = 4.0 }
             searchTextF.snp_updateConstraints { (make) in
                 make.trailing.equalToSuperview().inset(10 + space)
+                make.bottom.equalTo(-11 + margin)
             }
             
             leftIcon.alpha = 1 - offsetY / botView.bounds.size.height
@@ -132,11 +138,27 @@ class HomeNavigationBar: UIView {
             
             searchTextF.snp_updateConstraints { (make) in
                 make.trailing.equalToSuperview().inset(10)
+                make.bottom.equalTo(-11)
             }
             
             leftIcon.alpha = 1
             self.alpha = 1 + offsetY / botView.bounds.size.height
             self.transform = CGAffineTransform(translationX: 0, y: -offsetY)
         }
+    }
+    
+    func loadLeftIconImageWithURLString(_ url: String) {
+        weak var wks = self
+        leftIcon.kl_setImage(with: URL(string: url), placeholder: leftIcon.image, options: .progressiveBlur, completion: { (image, imageURL, type, stage, error) in
+            if image != nil {
+                var width = image!.size.width * (30.0 / image!.size.height)
+                wks!.leftIcon.snp_remakeConstraints({ (make) in
+                    make.left.equalTo(10)
+                    make.height.equalTo(30)
+                    make.centerY.equalTo(wks!.msg.snp_centerY)
+                    make.width.equalTo(width)
+                })
+            }
+        })
     }
 }

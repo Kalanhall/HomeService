@@ -88,6 +88,9 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
         tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
+        
+        // 动图加载
+        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
     }
     
     @objc func push() {
