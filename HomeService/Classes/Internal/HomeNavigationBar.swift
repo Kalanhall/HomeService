@@ -9,60 +9,22 @@ import UIKit
 import SnapKit
 import KLImageView
 
-class HomeNavigationBar: UIView {
+class HomeNavigationBar: UIView, UITextFieldDelegate {
     
-    lazy var topView = { () -> KLImageView in
-        let view = KLImageView()
-        view.contentMode = .scaleToFill
-        view.backgroundColor = .red
-        view.clipsToBounds = true
-        return view
-    } ()
+    typealias searchBlock = () -> Void
+    var searchFieldCallBack: searchBlock?
     
-    lazy var botView = { () -> KLImageView in
-        let view = KLImageView()
-        view.contentMode = .scaleToFill
-        view.backgroundColor = .red
-        view.clipsToBounds = true
-        return view
-    } ()
-    
-    lazy var leftIcon = { () -> KLImageView in
-        let view = KLImageView()
-        view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
-        view.contentMode = .scaleAspectFit
-        view.clipsToBounds = true
-        return view
-    } ()
-    
-    lazy var msg = { () -> UIButton in
-        let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
-        return view
-    } ()
-    
-    lazy var scan = { () -> UIButton in
-        let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
-        return view
-    } ()
-    
-    lazy var searchTextF = { () -> UITextField in
-        let view = UITextField()
-        view.backgroundColor = .white
-        view.layer.cornerRadius = 15
-        return view
-    } ()
-    
-    lazy var searchIcon = { () -> UIButton in
-        let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "searchIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
-        return view
-    } ()
-
     override init(frame: CGRect) {
         super.init(frame: frame)
-
+        viewInit()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Custom Methods
+    func viewInit() {
         self.addSubview(topView)
         topView.snp_makeConstraints { (make) in
             make.leading.trailing.top.equalToSuperview()
@@ -95,21 +57,19 @@ class HomeNavigationBar: UIView {
             make.centerY.equalTo(msg.snp_centerY)
         }
         
-        self.addSubview(searchTextF)
-        searchTextF.snp_makeConstraints { (make) in
+        self.addSubview(searchField)
+        searchField.snp_makeConstraints { (make) in
             make.height.equalTo(30)
             make.leading.equalTo(10)
             make.bottom.equalTo(-11)
             make.trailing.equalToSuperview().inset(10)
         }
         
-        searchIcon.frame = CGRect(x: 0, y: 0, width: 40, height: 30)
-        searchTextF.leftView = searchIcon
-        searchTextF.leftViewMode = .always
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        searchField.leftView = searchIcon
+        searchField.leftViewMode = .always
+        
+        searchField.rightView = cameraIcon
+        searchField.rightViewMode = .always
     }
     
     func scrollDidScroll(_ scrollView: UIScrollView) {
@@ -131,7 +91,7 @@ class HomeNavigationBar: UIView {
             var margin = rate * 4 * 2.5
             if space > 80.0 { space = 80.0 }
             if margin > 4.0 { margin = 4.0 }
-            searchTextF.snp_updateConstraints { (make) in
+            searchField.snp_updateConstraints { (make) in
                 make.trailing.equalToSuperview().inset(10 + space)
                 make.bottom.equalTo(-11 + margin)
             }
@@ -146,7 +106,7 @@ class HomeNavigationBar: UIView {
             }
             self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
             
-            searchTextF.snp_updateConstraints { (make) in
+            searchField.snp_updateConstraints { (make) in
                 make.trailing.equalToSuperview().inset(10)
                 make.bottom.equalTo(-11)
             }
@@ -173,4 +133,79 @@ class HomeNavigationBar: UIView {
             }
         })
     }
+    
+    // MARK: - Delegate
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if (searchFieldCallBack != nil) {
+            searchFieldCallBack!()
+        }
+        return false
+    }
+    
+    // MARK: - Lazy Methods
+    lazy var topView = { () -> KLImageView in
+        let view = KLImageView()
+        view.isUserInteractionEnabled = true
+        view.contentMode = .scaleToFill
+        view.backgroundColor = .red
+        view.clipsToBounds = true
+        return view
+    } ()
+    
+    lazy var botView = { () -> KLImageView in
+        let view = KLImageView()
+        view.isUserInteractionEnabled = true
+        view.contentMode = .scaleToFill
+        view.backgroundColor = .red
+        view.clipsToBounds = true
+        return view
+    } ()
+    
+    lazy var leftIcon = { () -> KLImageView in
+        let view = KLImageView()
+        view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
+        view.contentMode = .scaleAspectFit
+        view.clipsToBounds = true
+        return view
+    } ()
+    
+    lazy var msg = { () -> UIButton in
+        let view = UIButton(type: .custom)
+        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        return view
+    } ()
+    
+    lazy var scan = { () -> UIButton in
+        let view = UIButton(type: .custom)
+        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        return view
+    } ()
+    
+    lazy var searchField = { () -> UITextField in
+        let view = UITextField()
+        view.backgroundColor = .white
+        view.layer.cornerRadius = 15
+        view.delegate = self
+        return view
+    } ()
+    
+    var searchItem: UIButton!
+    lazy var searchIcon = { () -> UIView in
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
+        self.searchItem = UIButton(type: .custom)
+        self.searchItem.setImage(UIImage.image(named: "searchIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        self.searchItem.frame = view.frame
+        view.addSubview(self.searchItem!)
+        return view
+    } ()
+    
+    var cameraItem: UIButton!
+    lazy var cameraIcon = { () -> UIView in
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
+        self.cameraItem = UIButton(type: .custom)
+        self.cameraItem.setImage(UIImage.image(named: "cameraIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        self.cameraItem.frame = view.frame
+        view.addSubview(self.cameraItem!)
+        return view
+    } ()
 }

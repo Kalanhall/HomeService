@@ -9,7 +9,106 @@ import UIKit
 import SnapKit
 
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        kl_barAlpha = 0
+        kl_barStyle = .blackOpaque
+        view.backgroundColor = .white
+        
+        let barH = EXTopBarHeight() + 41.0
+        
+        view.addSubview(tableView)
+        tableView.snp_makeConstraints { (make) in
+            make.edges.equalToSuperview()
+        }
+        
+        view.addSubview(navigationBar)
+        navigationBar.snp_makeConstraints { (make) in
+            make.leading.top.trailing.equalToSuperview()
+            make.height.equalTo(barH)
+        }
+        
+        view.insertSubview(advertView, belowSubview: tableView)
+        advertView.snp_makeConstraints { (make) in
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalTo(navigationBar.snp_bottom).inset(-100.auto())
+        }
+        
+        view.insertSubview(navigationFootter, belowSubview: tableView)
+        navigationFootter.snp_makeConstraints { (make) in
+            make.leading.trailing.equalToSuperview()
+            make.top.equalTo(navigationBar.snp_bottom)
+        }
+        
+        tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
+        tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
+        
+        // 动图加载
+//        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
+        
+        actionInit()
+    }
     
+    // MARK: - Private
+    func actionInit() {
+        navigationBar.msg.addTarget(self, action: #selector(push), for: .touchUpInside)
+        navigationBar.scan.addTarget(self, action: #selector(push), for: .touchUpInside)
+        navigationBar.cameraItem.addTarget(self, action: #selector(push), for: .touchUpInside)
+        
+        navigationBar.searchFieldCallBack = { [weak self] () -> Void in
+            self?.push()
+        }
+    }
+    
+    @objc private func push() {
+        let vc = HomeSpecialController()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc private func fresh() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+            
+        }
+    }
+    
+    // MARK: - Delegate
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 20
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewCell.description()) as! UITableViewCell
+        cell.backgroundColor = .clear
+        cell.textLabel!.text = "\(indexPath)"
+        
+        return cell
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // 自定义导航栏处理
+        navigationBar.scrollDidScroll(scrollView)
+        
+        // 导航栏下部背景图处理
+        navigationFootter.alpha = navigationBar.alpha
+        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
+        if offsetY > 0 {
+            navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
+        } else {
+            navigationFootter.transform = .identity
+        }
+        
+        // 下拉广告图处理，> 50 才移动广告视图
+        advertView.alpha = 1 - navigationBar.alpha
+        if offsetY < 0 && fabs(offsetY) >= 50.0 {
+            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 50.0)
+        } else {
+            advertView.transform = .identity
+        }
+    }
+    
+    // MARK: - Lazy Load
     lazy var navigationBar = { () -> HomeNavigationBar in
         let view = HomeNavigationBar()
         view.topView.image = UIImage.image(named: "navtop", in: Bundle(for: type(of: self)))
@@ -50,85 +149,4 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         return tableView
     } ()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .white
-        
-        kl_barAlpha = 0
-        kl_barStyle = .blackOpaque
-        
-//        https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif
-        
-        let barH = EXTopBarHeight() + 41.0
-        
-        view.addSubview(tableView)
-        tableView.snp_makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
-        view.addSubview(navigationBar)
-        navigationBar.snp_makeConstraints { (make) in
-            make.leading.top.trailing.equalToSuperview()
-            make.height.equalTo(barH)
-        }
-        
-        view.insertSubview(advertView, belowSubview: tableView)
-        advertView.snp_makeConstraints { (make) in
-            make.leading.trailing.equalToSuperview()
-            make.bottom.equalTo(navigationBar.snp_bottom).inset(-100.auto())
-        }
-        
-        view.insertSubview(navigationFootter, belowSubview: tableView)
-        navigationFootter.snp_makeConstraints { (make) in
-            make.leading.trailing.equalToSuperview()
-            make.top.equalTo(navigationBar.snp_bottom)
-        }
-        
-        tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
-        tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
-        
-        // 动图加载
-//        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
-    }
-    
-    @objc func push() {
-        let vc = HomeSpecialController()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewCell.description()) as! UITableViewCell
-        cell.backgroundColor = .clear
-        cell.textLabel!.text = "\(indexPath)"
-        
-        return cell
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // 自定义导航栏处理
-        navigationBar.scrollDidScroll(scrollView)
-        
-        // 导航栏下部背景图处理
-        navigationFootter.alpha = navigationBar.alpha
-        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
-        if offsetY > 0 {
-            navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
-        } else {
-            navigationFootter.transform = .identity
-        }
-        
-        // 下拉广告图处理，> 50 才移动广告视图
-        advertView.alpha = 1 - navigationBar.alpha
-        if offsetY < 0 && fabs(offsetY) >= 50.0 {
-            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 50.0)
-        } else {
-            advertView.transform = .identity
-        }
-    }
 }
