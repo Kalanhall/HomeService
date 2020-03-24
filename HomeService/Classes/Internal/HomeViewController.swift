@@ -90,7 +90,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
         
         // 动图加载
-        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
+//        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
     }
     
     @objc func push() {
@@ -115,6 +115,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationBar.scrollDidScroll(scrollView)
         
         // 导航栏下部背景图处理
+        navigationFootter.alpha = navigationBar.alpha
         var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
         if offsetY > 0 {
             navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
