@@ -12,6 +12,7 @@ import RefreshKit
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var headerRefresh: DefaultRefreshHeader!
+    var isPushAdvert = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,6 +58,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
         
         headerRefresh = DefaultRefreshHeader.header()
+        headerRefresh.refreshHeight = 40
         headerRefresh.imageView.alpha = 0
         headerRefresh.indicator.alpha = 0
         headerRefresh.tintColor = .white
@@ -117,13 +119,16 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             navigationFootter.transform = .identity
         }
         
+        if self.isPushAdvert == true {
+            return
+        }
         // 下拉广告图处理，> 刷新控件高度 才移动广告视图
         advertView.alpha = 1 - navigationBar.alpha
         if offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height {
             advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - headerRefresh.bounds.size.height)
             
-            if scrollView.isDragging {
-                if fabs(offsetY) >= headerRefresh.bounds.size.height * 2 {
+            if advertView.image != nil && scrollView.isDragging {
+                if fabs(offsetY) >= headerRefresh.bounds.size.height * 3 {
                     headerRefresh.textLabel.text = "松开得惊喜"
                 } else {
                     headerRefresh.textLabel.text = "继续下拉有惊喜"
@@ -135,10 +140,25 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
-        if  offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height * 2 {
-            tableView.switchRefreshHeader(to: .normal(.none, 0))
-            print("跳转广告")
+        if advertView.image != nil {
+            var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
+            if  offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height * 3 {
+                self.isPushAdvert = true
+                UIView.animate(withDuration: 0.25, animations: {
+                    self.advertView.transform = CGAffineTransform(translationX: 0, y: self.EXScreenHeight() - self.navigationBar.bounds.size.height - 100.auto())
+                    self.tableView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.size.height)
+                }) { (finish) in
+                    print("跳转广告")
+                    self.push()
+                    
+                    // 回调执行的动画
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                        self.tableView.transform = .identity
+                        self.isPushAdvert = false
+                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    }
+                }
+            }
         }
     }
     
