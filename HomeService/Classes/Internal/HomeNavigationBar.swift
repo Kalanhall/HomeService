@@ -11,8 +11,17 @@ import KLImageView
 
 class HomeNavigationBar: UIView, UITextFieldDelegate {
     
-    typealias searchBlock = () -> Void
-    var searchFieldCallBack: searchBlock?
+    typealias SearchBlock = () -> Void
+    /// 搜索框点击回调
+    var searchFieldCallBack: SearchBlock?
+    
+    typealias LogoBlock = () -> Void
+    /// Logo点击回调
+    var logoCallBack: LogoBlock?
+    /// scrollview的conteninsert
+    var originalInsert: CGFloat = 0
+    /// 是否允许透明度变化
+    var alphaEnable: Bool = false
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -56,6 +65,8 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
             make.leading.equalTo(10)
             make.centerY.equalTo(msg.snp_centerY)
         }
+        let tap = UITapGestureRecognizer(target: self, action: #selector(logoTouchCallBack))
+        leftIcon.addGestureRecognizer(tap)
         
         self.addSubview(searchField)
         searchField.snp_makeConstraints { (make) in
@@ -73,7 +84,11 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     }
     
     func scrollDidScroll(_ scrollView: UIScrollView) {
-        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
+        if originalInsert == 0 {
+            originalInsert = scrollView.contentInset.top
+        }
+        
+        var offsetY = scrollView.contentOffset.y + originalInsert
         
         if offsetY >= 0 {
             // 上拉，变更布局
@@ -82,7 +97,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
             }
      
             self.snp_updateConstraints { (make) in
-                make.height.equalTo(scrollView.contentInset.top - offsetY)
+                make.height.equalTo(originalInsert - offsetY)
             }
             self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
             
@@ -97,12 +112,14 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
             }
             
             leftIcon.alpha = 1 - rate
-            self.alpha = 1
+            if alphaEnable {
+                self.alpha = 1
+            }
 //            self.transform = .identity
         } else {
             // 下拉，还原布局
             self.snp_updateConstraints { (make) in
-                make.height.equalTo(scrollView.contentInset.top)
+                make.height.equalTo(originalInsert)
             }
             self.layoutIfNeeded() // 必须确定父控件约束，才可变更子控件约束，否则crash
             
@@ -112,8 +129,10 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
             }
             
             leftIcon.alpha = 1
-            var rate = offsetY / 30.0
-            self.alpha = 1 + rate
+            if alphaEnable {
+                var rate = offsetY / 30.0
+                self.alpha = 1 + rate
+            }
 //            self.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         }
     }
@@ -132,6 +151,12 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
                 })
             }
         })
+    }
+    
+    @objc func logoTouchCallBack() {
+        if (logoCallBack != nil) {
+            logoCallBack!()
+        }
     }
     
     // MARK: - Delegate
@@ -166,6 +191,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
         view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
         view.contentMode = .scaleAspectFit
         view.clipsToBounds = true
+        view.isUserInteractionEnabled = true
         return view
     } ()
     

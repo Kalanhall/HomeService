@@ -7,12 +7,23 @@
 
 import UIKit
 import SnapKit
+import RefreshKit
 
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    
+    var headerRefresh: DefaultRefreshHeader!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        viewInit()
+        actionInit()
         
+        // 动图加载
+        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
+    }
+    
+    // MARK: - Private
+    func viewInit() {
         kl_barAlpha = 0
         kl_barStyle = .blackOpaque
         view.backgroundColor = .white
@@ -45,19 +56,30 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
         tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
         
-        // 动图加载
-//        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
-        
-        actionInit()
+        headerRefresh = DefaultRefreshHeader.header()
+        headerRefresh.imageView.alpha = 0
+        headerRefresh.indicator.alpha = 0
+        headerRefresh.tintColor = .white
+        headerRefresh.textLabel.font = UIFont.systemFont(ofSize: 12)
+        headerRefresh.setText("更新中", mode: .refreshing)
+        headerRefresh.setText("继续下拉有惊喜", mode: .releaseToRefresh)
+        self.tableView.handleRefreshHeader(with: headerRefresh, container: self) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+            }
+        }
     }
     
-    // MARK: - Private
     func actionInit() {
         navigationBar.msg.addTarget(self, action: #selector(push), for: .touchUpInside)
         navigationBar.scan.addTarget(self, action: #selector(push), for: .touchUpInside)
         navigationBar.cameraItem.addTarget(self, action: #selector(push), for: .touchUpInside)
         
-        navigationBar.searchFieldCallBack = { [weak self] () -> Void in
+        navigationBar.logoCallBack = { [weak self] in
+            self?.push()
+        }
+        
+        navigationBar.searchFieldCallBack = { [weak self] in
             self?.push()
         }
     }
@@ -66,13 +88,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         let vc = HomeSpecialController()
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    @objc private func fresh() {
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-            
-        }
-    }
-    
+
     // MARK: - Delegate
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 20
@@ -87,24 +103,42 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
         // 自定义导航栏处理
+        navigationBar.alphaEnable = advertView.image != nil
         navigationBar.scrollDidScroll(scrollView)
         
         // 导航栏下部背景图处理
         navigationFootter.alpha = navigationBar.alpha
-        var offsetY = scrollView.contentOffset.y + scrollView.contentInset.top
+        var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
         if offsetY > 0 {
             navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         } else {
             navigationFootter.transform = .identity
         }
         
-        // 下拉广告图处理，> 50 才移动广告视图
+        // 下拉广告图处理，> 刷新控件高度 才移动广告视图
         advertView.alpha = 1 - navigationBar.alpha
-        if offsetY < 0 && fabs(offsetY) >= 50.0 {
-            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - 50.0)
+        if offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height {
+            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - headerRefresh.bounds.size.height)
+            
+            if scrollView.isDragging {
+                if fabs(offsetY) >= headerRefresh.bounds.size.height * 2 {
+                    headerRefresh.textLabel.text = "松开得惊喜"
+                } else {
+                    headerRefresh.textLabel.text = "继续下拉有惊喜"
+                }
+            }
         } else {
             advertView.transform = .identity
+        }
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
+        if  offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height * 2 {
+            tableView.switchRefreshHeader(to: .normal(.none, 0))
+            print("跳转广告")
         }
     }
     
@@ -149,4 +183,5 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         return tableView
     } ()
+    
 }

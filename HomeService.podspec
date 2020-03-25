@@ -46,4 +46,6 @@ TODO: Add long description of the pod here.
   s.dependency 'SnapKit'
   s.dependency 'Alamofire'
   s.dependency 'IQKeyboardManagerSwift'
+  s.dependency 'RefreshKit'
+  
 end
