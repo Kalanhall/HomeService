@@ -112,6 +112,9 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
             }
             
             leftIcon.alpha = 1 - rate
+            scan.alpha = 1
+            msg.alpha = 1
+            searchField.alpha = 1
             if alphaEnable {
                 self.alpha = 1
             }
@@ -128,10 +131,14 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
                 make.bottom.equalTo(-11)
             }
             
-            leftIcon.alpha = 1
+            var rate = offsetY / 30.0
             if alphaEnable {
-                var rate = offsetY / 30.0
                 self.alpha = 1 + rate
+            } else {
+                leftIcon.alpha = 1 + rate
+                scan.alpha = leftIcon.alpha
+                msg.alpha = leftIcon.alpha
+                searchField.alpha = leftIcon.alpha
             }
 //            self.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         }

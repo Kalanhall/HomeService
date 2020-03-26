@@ -38,7 +38,8 @@ TODO: Add long description of the pod here.
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  
+  # 依赖基础模块
   s.dependency 'Extensions', '~> 1.0.0'
   s.dependency 'KLProgressHUD', '~> 1.0.0'
   s.dependency 'KLNavigationController'
@@ -47,5 +48,9 @@ TODO: Add long description of the pod here.
   s.dependency 'Alamofire'
   s.dependency 'IQKeyboardManagerSwift'
   s.dependency 'RefreshKit'
+  s.dependency 'CustomLoading'
+  
+  # 依赖业务模块
+  s.dependency 'LoginServiceInterface'
   
 end

@@ -8,10 +8,14 @@
 import UIKit
 import SnapKit
 import RefreshKit
+import CustomLoading
+import KLNavigationController
+import LoginServiceInterface
 
 class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     var headerRefresh: DefaultRefreshHeader!
+    var animatRefresh: JDPullRefreshHeader!
     var isPushAdvert = false
 
     override func viewDidLoad() {
@@ -19,7 +23,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         viewInit()
         actionInit()
         
-        // 动图加载
+        // 网络动图加载
         self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
     }
     
@@ -57,23 +61,36 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
         tableView.setContentOffset(CGPoint(x: 0, y: -barH), animated: false)
         
-        headerRefresh = DefaultRefreshHeader.header()
-        headerRefresh.refreshHeight = 40
-        headerRefresh.imageView.alpha = 0
-        headerRefresh.indicator.alpha = 0
-        headerRefresh.tintColor = .white
-        headerRefresh.textLabel.font = UIFont.systemFont(ofSize: 12)
-        headerRefresh.setText("更新中", mode: .refreshing)
-        headerRefresh.setText("继续下拉有惊喜", mode: .releaseToRefresh)
-        self.tableView.handleRefreshHeader(with: headerRefresh, container: self) { [weak self] in
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
-                self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+        
+        // 根据广告标识，处理相关UI布局
+        if advertView.image == nil {
+            animatRefresh = JDPullRefreshHeader(frame: CGRect(x: 0,y: 0,width: self.view.bounds.width,height: 60))
+                self.tableView.handleRefreshHeader(with: animatRefresh,container:self) { [weak self] in
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                        self?.tableView.switchRefreshHeader(to: .normal(.none, 0.0))
+                    }
+            };
+        } else {
+            // 默认样式
+            headerRefresh = DefaultRefreshHeader.header()
+            headerRefresh.refreshHeight = 40
+            headerRefresh.imageView.alpha = 0
+            headerRefresh.indicator.alpha = 0
+            headerRefresh.tintColor = .white
+            headerRefresh.textLabel.font = UIFont.systemFont(ofSize: 12)
+            headerRefresh.setText("更新中", mode: .refreshing)
+            self.tableView.handleRefreshHeader(with: headerRefresh, container: self) { [weak self] in
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
+                    self?.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                }
             }
+            
+            headerRefresh.setText("继续下拉有惊喜", mode: .releaseToRefresh)
         }
     }
     
     func actionInit() {
-        navigationBar.msg.addTarget(self, action: #selector(push), for: .touchUpInside)
+        navigationBar.msg.addTarget(self, action: #selector(login), for: .touchUpInside)
         navigationBar.scan.addTarget(self, action: #selector(push), for: .touchUpInside)
         navigationBar.cameraItem.addTarget(self, action: #selector(push), for: .touchUpInside)
         
@@ -84,6 +101,12 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationBar.searchFieldCallBack = { [weak self] in
             self?.push()
         }
+    }
+    
+    @objc private func login() {
+        let vc = KLServer.shared().login(with: nil)
+        let nav = KLNavigationController(rootViewController: vc)
+        present(nav, animated: true, completion: nil)
     }
     
     @objc private func push() {
@@ -111,31 +134,29 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         navigationBar.scrollDidScroll(scrollView)
         
         // 导航栏下部背景图处理
-        navigationFootter.alpha = navigationBar.alpha
         var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
         if offsetY > 0 {
             navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         } else {
             navigationFootter.transform = .identity
         }
-        
-        if self.isPushAdvert == true {
-            return
-        }
+        navigationFootter.alpha = navigationBar.alpha
+
         // 下拉广告图处理，> 刷新控件高度 才移动广告视图
-        advertView.alpha = 1 - navigationBar.alpha
-        if offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height {
-            advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - headerRefresh.bounds.size.height)
-            
-            if advertView.image != nil && scrollView.isDragging {
-                if fabs(offsetY) >= headerRefresh.bounds.size.height * 3 {
-                    headerRefresh.textLabel.text = "松开得惊喜"
-                } else {
-                    headerRefresh.textLabel.text = "继续下拉有惊喜"
+        if self.isPushAdvert == false && advertView.image != nil {
+            if offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height {
+                if scrollView.isDragging {
+                    if fabs(offsetY) >= headerRefresh.bounds.size.height * 3 {
+                        headerRefresh.textLabel.text = "松开得惊喜"
+                    } else {
+                        headerRefresh.textLabel.text = "继续下拉有惊喜"
+                    }
                 }
+                advertView.transform = CGAffineTransform(translationX: 0, y: fabs(offsetY) - headerRefresh.bounds.size.height)
+            } else {
+                advertView.transform = .identity
             }
-        } else {
-            advertView.transform = .identity
+            advertView.alpha = 1 - navigationBar.alpha
         }
     }
     
@@ -144,18 +165,29 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
             if  offsetY < 0 && fabs(offsetY) >= headerRefresh.bounds.size.height * 3 {
                 self.isPushAdvert = true
-                UIView.animate(withDuration: 0.25, animations: {
+                UIView.animate(withDuration: 0.3, animations: {
                     self.advertView.transform = CGAffineTransform(translationX: 0, y: self.EXScreenHeight() - self.navigationBar.bounds.size.height - 100.auto())
                     self.tableView.transform = CGAffineTransform(translationX: 0, y: self.view.bounds.size.height)
                 }) { (finish) in
-                    print("跳转广告")
-                    self.push()
-                    
-                    // 回调执行的动画
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-                        self.tableView.transform = .identity
-                        self.isPushAdvert = false
-                        self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    self.tableView.switchRefreshHeader(to: .normal(.none, 0))
+                    // 跳转广告页
+                    let vc = HomeAdvertController()
+                    self.navigationController?.pushViewController(vc, animated: false)
+                    // 广告页取消回调
+                    vc.cancleCallBack = { [weak self] (touch) in
+                        self?.isPushAdvert = false
+                        self?.navigationBar.alpha = 0
+                        self?.navigationFootter.alpha = 0
+                        UIView.animate(withDuration: touch == true ? 0 : 0.3, animations: {
+                            self?.tableView.transform = .identity
+                            self?.advertView.transform = .identity
+                            self?.navigationBar.alpha = 1
+                            self?.navigationFootter.alpha = 1
+                        }) { (finish) in
+                            if touch {
+                                self?.push()
+                            }
+                        }
                     }
                 }
             }
