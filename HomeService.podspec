@@ -40,8 +40,8 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   
   # 依赖基础模块
-  s.dependency 'Extensions', '~> 1.0.0'
-  s.dependency 'KLProgressHUD', '~> 1.0.0'
+  s.dependency 'Extensions'
+  s.dependency 'KLProgressHUD'
   s.dependency 'KLNavigationController'
   s.dependency 'KLImageView'
   s.dependency 'SnapKit'

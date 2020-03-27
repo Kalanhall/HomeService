@@ -178,7 +178,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     lazy var topView = { () -> KLImageView in
         let view = KLImageView()
         view.isUserInteractionEnabled = true
-        view.contentMode = .scaleToFill
+        view.contentMode = .scaleAspectFill
         view.backgroundColor = .red
         view.clipsToBounds = true
         return view
@@ -187,7 +187,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     lazy var botView = { () -> KLImageView in
         let view = KLImageView()
         view.isUserInteractionEnabled = true
-        view.contentMode = .scaleToFill
+        view.contentMode = .scaleAspectFill
         view.backgroundColor = .red
         view.clipsToBounds = true
         return view
@@ -195,7 +195,6 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     
     lazy var leftIcon = { () -> KLImageView in
         let view = KLImageView()
-        view.image = UIImage.image(named: "navleft", in: Bundle(for: HomeNavigationBar.self))
         view.contentMode = .scaleAspectFit
         view.clipsToBounds = true
         view.isUserInteractionEnabled = true
@@ -204,13 +203,11 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     
     lazy var msg = { () -> UIButton in
         let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
         return view
     } ()
     
     lazy var scan = { () -> UIButton in
         let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
         return view
     } ()
     

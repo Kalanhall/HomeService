@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Extensions
 import RefreshKit
 import CustomLoading
 import KLNavigationController
@@ -24,7 +25,24 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         actionInit()
         
         // 网络动图加载
-        self.navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/85429/28/14743/48503/5e69e4b9Eeb1dd33e/d00fd078bbc1a3ab.gif")
+        navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/100993/22/16379/203958/5e7cb242Eecf6e7d3/f8dd649c0c215198.gif")
+        
+        navigationBar.topView.kl_setImage(with: URL(string: "https://m.360buyimg.com/mobilecms/s1125x939_jfs/t1/108997/36/10225/123811/5e7aff96E3685704b/a4c90f5b8a0cb6e9.jpg.dpg.webp"), placeholder: nil, options: .progressiveBlur) { [weak self] (image, url, type, stage, error) in
+            let size = CGSize(width: (image?.size.width ?? 0) * UIScreen.main.scale, height: (image?.size.height ?? 0) * UIScreen.main.scale)
+  
+            let fotheight = self!.navigationFooter.bounds.size.height * (size.width / self!.navigationFooter.bounds.size.width)
+            let fotrect = CGRect(x: 0, y: size.height - fotheight, width: size.width, height: fotheight)
+            self!.navigationFooter.image = UIImage.imageCropping(image, in: fotrect, with: UIImage.image(named: "navfooter", in: Bundle(for: HomeViewController.self)))
+            
+            let botheight = self!.navigationBar.botView.bounds.size.height * (size.width / self!.navigationBar.botView.bounds.size.width)
+            let botrect = CGRect(x: 0, y: size.height - botheight - fotheight, width: size.width, height: botheight)
+            self!.navigationBar.botView.image = UIImage.imageCropping(image, in: botrect, with: UIImage.image(named: "navbot", in: Bundle(for: HomeViewController.self)))
+            
+            let topheight = self!.navigationBar.topView.bounds.size.height * (size.width / self!.navigationBar.topView.bounds.size.width)
+            let toprect = CGRect(x: 0, y: size.height - botheight - fotheight - topheight, width: size.width, height: topheight)
+            self!.navigationBar.topView.image = UIImage.imageCropping(image, in: toprect, with: UIImage.image(named: "navtop", in: Bundle(for: HomeViewController.self)))
+        }
+
     }
     
     // MARK: - Private
@@ -52,10 +70,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.bottom.equalTo(navigationBar.snp_bottom).inset(-100.auto())
         }
         
-        view.insertSubview(navigationFootter, belowSubview: tableView)
-        navigationFootter.snp_makeConstraints { (make) in
+        view.insertSubview(navigationFooter, belowSubview: tableView)
+        navigationFooter.snp_makeConstraints { (make) in
             make.leading.trailing.equalToSuperview()
             make.top.equalTo(navigationBar.snp_bottom)
+            make.height.equalTo(173.auto())
         }
         
         tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
@@ -78,6 +97,7 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
             headerRefresh.indicator.alpha = 0
             headerRefresh.tintColor = .white
             headerRefresh.textLabel.font = UIFont.systemFont(ofSize: 12)
+            headerRefresh.setText("下拉刷新", mode: .pullToRefresh)
             headerRefresh.setText("更新中", mode: .refreshing)
             self.tableView.handleRefreshHeader(with: headerRefresh, container: self) { [weak self] in
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
@@ -136,11 +156,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // 导航栏下部背景图处理
         var offsetY = scrollView.contentOffset.y + navigationBar.originalInsert
         if offsetY > 0 {
-            navigationFootter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
+            navigationFooter.transform = CGAffineTransform(translationX: 0, y: -offsetY) // 导航栏下移
         } else {
-            navigationFootter.transform = .identity
+            navigationFooter.transform = .identity
         }
-        navigationFootter.alpha = navigationBar.alpha
+        navigationFooter.alpha = navigationBar.alpha
 
         // 下拉广告图处理，> 刷新控件高度 才移动广告视图
         if self.isPushAdvert == false && advertView.image != nil {
@@ -172,23 +192,25 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
                     self.tableView.switchRefreshHeader(to: .normal(.none, 0))
                     // 跳转广告页
                     let vc = HomeAdvertController()
-                    self.navigationController?.pushViewController(vc, animated: false)
+                    
                     // 广告页取消回调
                     vc.cancleCallBack = { [weak self] (touch) in
                         self?.isPushAdvert = false
                         self?.navigationBar.alpha = 0
-                        self?.navigationFootter.alpha = 0
+                        self?.navigationFooter.alpha = 0
                         UIView.animate(withDuration: touch == true ? 0 : 0.3, animations: {
                             self?.tableView.transform = .identity
                             self?.advertView.transform = .identity
                             self?.navigationBar.alpha = 1
-                            self?.navigationFootter.alpha = 1
+                            self?.navigationFooter.alpha = 1
                         }) { (finish) in
                             if touch {
                                 self?.push()
                             }
                         }
                     }
+                    
+                    self.navigationController?.pushViewController(vc, animated: false)
                 }
             }
         }
@@ -197,23 +219,20 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     // MARK: - Lazy Load
     lazy var navigationBar = { () -> HomeNavigationBar in
         let view = HomeNavigationBar()
-        view.topView.image = UIImage.image(named: "navtop", in: Bundle(for: type(of: self)))
-        view.botView.image = UIImage.image(named: "navbot", in: Bundle(for: type(of: self)))
         return view
     } ()
     
-    lazy var navigationFootter = { () -> UIImageView in
+    lazy var navigationFooter = { () -> UIImageView in
         let view = UIImageView()
         view.contentMode = .scaleToFill
         view.clipsToBounds = true
-        view.image = UIImage.image(named: "navfootter", in: Bundle(for: type(of: self)))
         return view
     } ()
     
     lazy var advertView = { () -> UIImageView in
         let view = UIImageView()
         view.contentMode = .scaleToFill
-        view.image = UIImage.image(named: "advertView", in: Bundle(for: type(of: self)))
+//        view.image = UIImage.image(named: "advertView", in: Bundle(for: type(of: self)))
         view.alpha = 0
         return view
     } ()
