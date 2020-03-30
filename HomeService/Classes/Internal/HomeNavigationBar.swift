@@ -203,11 +203,13 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     
     lazy var msg = { () -> UIButton in
         let view = UIButton(type: .custom)
+        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
         return view
     } ()
     
     lazy var scan = { () -> UIButton in
         let view = UIButton(type: .custom)
+        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
         return view
     } ()
     

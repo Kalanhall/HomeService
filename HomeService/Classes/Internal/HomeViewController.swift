@@ -27,7 +27,8 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         // 网络动图加载
         navigationBar.loadLeftIconImageWithURLString("https://m.360buyimg.com/mobilecms/jfs/t1/100993/22/16379/203958/5e7cb242Eecf6e7d3/f8dd649c0c215198.gif")
         
-        navigationBar.topView.kl_setImage(with: URL(string: "https://m.360buyimg.com/mobilecms/s1125x939_jfs/t1/108997/36/10225/123811/5e7aff96E3685704b/a4c90f5b8a0cb6e9.jpg.dpg.webp"), placeholder: nil, options: .progressiveBlur) { [weak self] (image, url, type, stage, error) in
+        //
+        navigationBar.topView.kl_setImage(with: URL(string: "https://m.360buyimg.com/mobilecms/s1125x939_jfs/t1/108997/36/10225/123811/5e7aff96E3685704b/a4c90f5b8a0cb6e9.jpg.dpg.webp1"), placeholder: nil, options: .progressiveBlur) { [weak self] (image, url, type, stage, error) in
             let size = CGSize(width: (image?.size.width ?? 0) * UIScreen.main.scale, height: (image?.size.height ?? 0) * UIScreen.main.scale)
   
             let fotheight = self!.navigationFooter.bounds.size.height * (size.width / self!.navigationFooter.bounds.size.width)
