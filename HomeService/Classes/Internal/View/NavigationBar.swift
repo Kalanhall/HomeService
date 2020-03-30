@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import KLImageView
 
-class HomeNavigationBar: UIView, UITextFieldDelegate {
+class NavigationBar: UIView, UITextFieldDelegate {
     
     typealias SearchBlock = () -> Void
     /// 搜索框点击回调
@@ -203,13 +203,13 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     
     lazy var msg = { () -> UIButton in
         let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        view.setImage(UIImage.image(named: "navmsg", in: Bundle(for: NavigationBar.self)), for: .normal)
         return view
     } ()
     
     lazy var scan = { () -> UIButton in
         let view = UIButton(type: .custom)
-        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        view.setImage(UIImage.image(named: "navscan", in: Bundle(for: NavigationBar.self)), for: .normal)
         return view
     } ()
     
@@ -225,7 +225,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     lazy var searchIcon = { () -> UIView in
         let view = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
         self.searchItem = UIButton(type: .custom)
-        self.searchItem.setImage(UIImage.image(named: "searchIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        self.searchItem.setImage(UIImage.image(named: "searchIcon", in: Bundle(for: NavigationBar.self)), for: .normal)
         self.searchItem.frame = view.frame
         view.addSubview(self.searchItem!)
         return view
@@ -235,7 +235,7 @@ class HomeNavigationBar: UIView, UITextFieldDelegate {
     lazy var cameraIcon = { () -> UIView in
         let view = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 30))
         self.cameraItem = UIButton(type: .custom)
-        self.cameraItem.setImage(UIImage.image(named: "cameraIcon", in: Bundle(for: HomeNavigationBar.self)), for: .normal)
+        self.cameraItem.setImage(UIImage.image(named: "cameraIcon", in: Bundle(for: NavigationBar.self)), for: .normal)
         self.cameraItem.frame = view.frame
         view.addSubview(self.cameraItem!)
         return view
