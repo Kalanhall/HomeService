@@ -39,15 +39,15 @@ class HomeViewController: UIViewController {
         navigationBarControl.navigationBar.topView.kl_setImage(with: URL(string: "https://m.360buyimg.com/mobilecms/s1125x939_jfs/t1/108997/36/10225/123811/5e7aff96E3685704b/a4c90f5b8a0cb6e9.jpg.dpg.webp"), placeholder: nil, options: .progressiveBlur) { [weak self] (image, url, type, stage, error) in
             let size = CGSize(width: (image?.size.width ?? 0) * UIScreen.main.scale, height: (image?.size.height ?? 0) * UIScreen.main.scale)
   
-            let fotheight = 173.auto() * (size.width / self!.navigationBarControl.navigationFooter.bounds.size.width)
+            let fotheight = 173.auto() * (size.width / self!.view.bounds.size.width)
             let fotrect = CGRect(x: 0, y: size.height - fotheight, width: size.width, height: fotheight)
             self!.navigationBarControl.navigationFooter.image = UIImage.imageCropping(image, in: fotrect, with: UIImage.image(named: "navfooter", in: Bundle(for: HomeViewController.self)))
             
-            let botheight = self!.navigationBarControl.navigationBar.botView.bounds.size.height * (size.width / self!.navigationBarControl.navigationBar.botView.bounds.size.width)
+            let botheight = self!.navigationBarControl.navigationBar.botView.bounds.size.height * (size.width / self!.view.bounds.size.width)
             let botrect = CGRect(x: 0, y: size.height - botheight - fotheight, width: size.width, height: botheight)
             self!.navigationBarControl.navigationBar.botView.image = UIImage.imageCropping(image, in: botrect, with: UIImage.image(named: "navbot", in: Bundle(for: HomeViewController.self)))
             
-            let topheight = self!.navigationBarControl.navigationBar.topView.bounds.size.height * (size.width / self!.navigationBarControl.navigationBar.topView.bounds.size.width)
+            let topheight = self!.navigationBarControl.navigationBar.topView.bounds.size.height * (size.width / self!.view.bounds.size.width)
             let toprect = CGRect(x: 0, y: size.height - botheight - fotheight - topheight, width: size.width, height: topheight)
             self!.navigationBarControl.navigationBar.topView.image = UIImage.imageCropping(image, in: toprect, with: UIImage.image(named: "navtop", in: Bundle(for: HomeViewController.self)))
         }
