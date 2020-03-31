@@ -39,7 +39,7 @@ class HomeViewController: UIViewController {
         navigationBarControl.navigationBar.topView.kl_setImage(with: URL(string: "https://m.360buyimg.com/mobilecms/s1125x939_jfs/t1/108997/36/10225/123811/5e7aff96E3685704b/a4c90f5b8a0cb6e9.jpg.dpg.webp"), placeholder: nil, options: .progressiveBlur) { [weak self] (image, url, type, stage, error) in
             let size = CGSize(width: (image?.size.width ?? 0) * UIScreen.main.scale, height: (image?.size.height ?? 0) * UIScreen.main.scale)
   
-            let fotheight = 173.auto() * (size.width / self!.view.bounds.size.width)
+            let fotheight = 173.auto() * (size.width / self!.view.bounds.size.width) /* 173 第一行Cell高度 */
             let fotrect = CGRect(x: 0, y: size.height - fotheight, width: size.width, height: fotheight)
             self!.navigationBarControl.navigationFooter.image = UIImage.imageCropping(image, in: fotrect, with: UIImage.image(named: "navfooter", in: Bundle(for: HomeViewController.self)))
             
@@ -88,7 +88,7 @@ class HomeViewController: UIViewController {
         navigationBarControl.navigationFooter.snp_makeConstraints { (make) in
             make.leading.trailing.equalToSuperview()
             make.top.equalTo(navigationBarControl.navigationBar.snp_bottom)
-            make.height.lessThanOrEqualTo(173.auto())
+            make.height.lessThanOrEqualTo(173.auto()) /* 173 第一行Cell高度 */
         }
         
         tableViewControl.tableView.contentInset = UIEdgeInsets(top: barH, left: 0, bottom: EXBottomBarHeight(), right: 0)
