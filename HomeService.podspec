@@ -41,14 +41,11 @@ TODO: Add long description of the pod here.
   
   # 依赖基础模块
   s.dependency 'Extensions'
-  s.dependency 'KLProgressHUD'
   s.dependency 'KLNavigationController'
-  s.dependency 'KLImageView'
   s.dependency 'SnapKit'
   s.dependency 'Alamofire'
   s.dependency 'IQKeyboardManagerSwift'
   s.dependency 'RefreshKit'
-  s.dependency 'CustomLoading'
   
   # 依赖业务模块
   s.dependency 'LoginServiceInterface'
