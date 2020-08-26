@@ -1,16 +1,98 @@
 PODS:
-  - HomeService (0.1.0)
+  - Alamofire (4.9.1)
+  - CTMediator (44)
+  - Extensions (1.0.9.1)
+  - HBDNavigationBar (1.7.7)
+  - HomeService (0.1.0):
+    - Alamofire
+    - Extensions
+    - HBDNavigationBar
+    - IQKeyboardManagerSwift
+    - JXSegmentedView
+    - SnapKit
+    - Texture
+  - HomeServiceInterface (0.1.0):
+    - CTMediator
+  - IQKeyboardManagerSwift (6.5.6)
+  - JXSegmentedView (1.2.7)
+  - PINCache (3.0.1-beta.8):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.8)
+    - PINCache/Core (= 3.0.1-beta.8)
+  - PINCache/Arc-exception-safe (3.0.1-beta.8):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.8):
+    - PINOperation (~> 1.1.1)
+  - PINOperation (1.1.2)
+  - PINRemoteImage/Core (3.0.0):
+    - PINOperation
+  - PINRemoteImage/iOS (3.0.0):
+    - PINRemoteImage/Core
+  - PINRemoteImage/PINCache (3.0.0):
+    - PINCache (= 3.0.1-beta.8)
+    - PINRemoteImage/Core
+  - SnapKit (4.2.0)
+  - Texture (3.0.0):
+    - Texture/AssetsLibrary (= 3.0.0)
+    - Texture/Core (= 3.0.0)
+    - Texture/MapKit (= 3.0.0)
+    - Texture/Photos (= 3.0.0)
+    - Texture/PINRemoteImage (= 3.0.0)
+    - Texture/Video (= 3.0.0)
+  - Texture/AssetsLibrary (3.0.0):
+    - Texture/Core
+  - Texture/Core (3.0.0)
+  - Texture/MapKit (3.0.0):
+    - Texture/Core
+  - Texture/Photos (3.0.0):
+    - Texture/Core
+  - Texture/PINRemoteImage (3.0.0):
+    - PINRemoteImage/iOS (~> 3.0.0)
+    - PINRemoteImage/PINCache
+    - Texture/Core
+  - Texture/Video (3.0.0):
+    - Texture/Core
 
 DEPENDENCIES:
   - HomeService (from `../`)
+  - HomeServiceInterface (from `/Users/kalan/HomeServiceInterface`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - CTMediator
+  https://github.com/Kalanhall/Specs.git:
+    - Extensions
+  trunk:
+    - Alamofire
+    - HBDNavigationBar
+    - IQKeyboardManagerSwift
+    - JXSegmentedView
+    - PINCache
+    - PINOperation
+    - PINRemoteImage
+    - SnapKit
+    - Texture
 
 EXTERNAL SOURCES:
   HomeService:
     :path: "../"
+  HomeServiceInterface:
+    :path: "/Users/kalan/HomeServiceInterface"
 
 SPEC CHECKSUMS:
-  HomeService: 885d892296a68d398a2c7e47f3409450b6013b01
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  CTMediator: 933dba523da87bf875e4a7e8728945fbc512f1d2
+  Extensions: fe7fa8825317b37749a174b2edfb8e2d97901276
+  HBDNavigationBar: 6ba38b99637039c831ce460364d5398f29fa0685
+  HomeService: b372779f208d7dbfbc470252e34e299ddc31b748
+  HomeServiceInterface: f9f819e32edaa69c543fe2c30c78982079f7139c
+  IQKeyboardManagerSwift: c7df9d2deb356c04522f5c4b7b6e4ce4d8ed94fe
+  JXSegmentedView: eb1cad21f57c2543c00c3e08b8fd3c7ca54f5acd
+  PINCache: 534fd41d358d828dfdf227a0d327f3673a65e20b
+  PINOperation: 24b774353ca248fcf87d67b2d61eef42087c125a
+  PINRemoteImage: e2b89e19fb6e77ffc099f9d9f3b3fe1745e3f9f9
+  SnapKit: fe8a619752f3f27075cc9a90244d75c6c3f27e2a
+  Texture: 2f109e937850d94d1d07232041c9c7313ccddb81
 
-PODFILE CHECKSUM: 6e249794224d4c4f4ef1a118a7b26f0316f84a08
+PODFILE CHECKSUM: f5621e3124f70f5d0d0acafa990acb8558815542
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.9.1

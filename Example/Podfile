@@ -1,11 +1,15 @@
 use_frameworks!
 
+source 'https://github.com/CocoaPods/Specs.git'
+source 'https://github.com/Kalanhall/Specs.git'
+
 target 'HomeService_Example' do
   pod 'HomeService', :path => '../'
 
   target 'HomeService_Tests' do
     inherit! :search_paths
 
+    pod 'HomeServiceInterface', :path=>'/Users/kalan/HomeServiceInterface'
     
   end
 end

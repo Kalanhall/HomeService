@@ -40,14 +40,13 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   
   # 依赖基础模块
+  # - 功能类
   s.dependency 'Extensions'
-  s.dependency 'KLNavigationController'
+  s.dependency 'Texture'
   s.dependency 'SnapKit'
   s.dependency 'Alamofire'
   s.dependency 'IQKeyboardManagerSwift'
-  s.dependency 'RefreshKit'
-  
-  # 依赖业务模块
-  s.dependency 'LoginServiceInterface'
-  
+  # - 视图类
+  s.dependency 'HBDNavigationBar'
+  s.dependency 'JXSegmentedView'
 end

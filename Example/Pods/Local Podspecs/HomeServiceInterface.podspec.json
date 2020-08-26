@@ -1,0 +1,27 @@
+{
+  "name": "HomeServiceInterface",
+  "version": "0.1.0",
+  "summary": "A short description of HomeServiceInterface.",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/Kalanhall@163.com/HomeServiceInterface",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Kalanhall@163.com": "wujm002@galanz.com"
+  },
+  "source": {
+    "git": "https://github.com/Kalanhall@163.com/HomeServiceInterface.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "HomeServiceInterface/Classes/**/*",
+  "dependencies": {
+    "CTMediator": [
+
+    ]
+  }
+}

@@ -16,7 +16,35 @@
     "tag": "0.1.0"
   },
   "platforms": {
-    "ios": "8.0"
+    "ios": "9.0"
   },
-  "source_files": "HomeService/Classes/**/*"
+  "source_files": "HomeService/Classes/**/*",
+  "resource_bundles": {
+    "HomeService": [
+      "HomeService/Assets/*"
+    ]
+  },
+  "dependencies": {
+    "Extensions": [
+
+    ],
+    "Texture": [
+
+    ],
+    "SnapKit": [
+
+    ],
+    "Alamofire": [
+
+    ],
+    "IQKeyboardManagerSwift": [
+
+    ],
+    "HBDNavigationBar": [
+
+    ],
+    "JXSegmentedView": [
+
+    ]
+  }
 }
