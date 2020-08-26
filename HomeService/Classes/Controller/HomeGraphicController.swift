@@ -49,6 +49,7 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
     func tableNode(_ tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath) -> ASCellNode {
         let cell = HomeGraphicCell()
         
+        
         return cell
     }
     
@@ -56,4 +57,5 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
         tableNode.deselectRow(at: indexPath, animated: true)
         
     }
+    
 }

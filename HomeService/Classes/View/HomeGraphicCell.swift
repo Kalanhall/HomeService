@@ -9,8 +9,8 @@ import UIKit
 import AsyncDisplayKit
 import Extensions
 
-class HomeGraphicCell: ASCellNode {
-    
+class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource, ASCollectionGalleryLayoutPropertiesProviding {
+
     let iconNode = ASNetworkImageNode()
     let nameNode = ASTextNode()
     let timeNode = ASTextNode()
@@ -40,12 +40,15 @@ class HomeGraphicCell: ASCellNode {
         textNode.attributedText = NSAttributedString(string: "时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切时间会说明一切",
                                                      attributes: [.font : UIFont.systemFont(ofSize: 13),
                                                                   .foregroundColor : UIColor.color(hexNumber: 0x222222)])
+        
         addSubnode(textNode)
         
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        imagesNode = ASCollectionNode(collectionViewLayout: layout)
-        imagesNode.style.preferredSize = CGSize(width: 0, height: 150.auto())
+        let delegate = ASCollectionGalleryLayoutDelegate(scrollableDirections: .down)
+        delegate.propertiesProvider = self
+        imagesNode = ASCollectionNode(layoutDelegate: delegate, layoutFacilitator: nil)
+        imagesNode.showsVerticalScrollIndicator = false
+        imagesNode.delegate = self
+        imagesNode.dataSource = self
         addSubnode(imagesNode)
         
         lineNode.backgroundColor = UIColor.color(hexNumber: 0xE3E3E3)
@@ -56,6 +59,29 @@ class HomeGraphicCell: ASCellNode {
         let backView = UIView()
         backView.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
         selectedBackgroundView = backView
+    }
+    
+    func collectionNode(_ collectionNode: ASCollectionNode, numberOfItemsInSection section: Int) -> Int {
+        return 9
+    }
+    
+    func collectionNode(_ collectionNode: ASCollectionNode, nodeForItemAt indexPath: IndexPath) -> ASCellNode {
+        let cell = HomeGraphicImageCell()
+        
+        return cell
+    }
+    
+    func galleryLayoutDelegate(_ delegate: ASCollectionGalleryLayoutDelegate, sizeForElements elements: ASElementMap) -> CGSize {
+        let imageSize = (imagesNode.frame.size.width - 10) / 3.0
+        return CGSize(width: imageSize, height: imageSize)
+    }
+    
+    func galleryLayoutDelegate(_ delegate: ASCollectionGalleryLayoutDelegate, minimumLineSpacingForElements elements: ASElementMap) -> CGFloat {
+        return 5
+    }
+    
+    func galleryLayoutDelegate(_ delegate: ASCollectionGalleryLayoutDelegate, minimumInteritemSpacingForElements elements: ASElementMap) -> CGFloat {
+        return 5
     }
 
     // ASLayoutSpec
@@ -74,6 +100,10 @@ class HomeGraphicCell: ASCellNode {
                                        justifyContent: .start,
                                        alignItems: .center,
                                        children: [iconNode, name])
+        
+        // 图片
+        let imageSize = (UIScreen.main.bounds.size.width - 30) / 3.0
+        imagesNode.style.preferredSize = CGSize(width: 0, height: (imageSize * 3 + 10))
         
         // 整体
         let conten = ASStackLayoutSpec.vertical()
