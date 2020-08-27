@@ -17,6 +17,7 @@ class HomeGraphicImageCell: ASCellNode {
         super.init()
         
         imageNode.image = UIImage.image(named: "logo", in: Bundle(for: HomeGraphicCell.self))
+        layer.borderWidth = 1
         addSubnode(imageNode)
     }
 

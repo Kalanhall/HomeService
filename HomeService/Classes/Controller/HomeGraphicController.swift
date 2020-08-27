@@ -47,7 +47,7 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
     }
     
     func tableNode(_ tableNode: ASTableNode, nodeForRowAt indexPath: IndexPath) -> ASCellNode {
-        let cell = HomeGraphicCell()
+        let cell = HomeGraphicCell(numberOfImages: Int(arc4random_uniform(10)))
         
         
         return cell
