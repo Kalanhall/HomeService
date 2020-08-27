@@ -68,16 +68,10 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         editNode.setBackgroundImage(UIImage.image(color: UIColor.color(hexNumber: 0xE5E5E5)), for: .highlighted)
         addSubnode(editNode)
         
-        editNode.addTarget(self, action: #selector(editTouchUpInside), forControlEvents: .touchUpInside)
-        
         lineNode.backgroundColor = UIColor.color(hexNumber: 0xE3E3E3)
         lineNode.style.flexGrow = 1
         lineNode.style.preferredSize = CGSize(width: 0, height: 0.5)
         addSubnode(lineNode)
-    }
-    
-    @objc func editTouchUpInside(sender: ASButtonNode) {
-        print("editTouchUpInside")
     }
     
     func collectionNode(_ collectionNode: ASCollectionNode, numberOfItemsInSection section: Int) -> Int {
@@ -88,6 +82,10 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         let cell = HomeGraphicImageCell()
         
         return cell
+    }
+    
+    func collectionNode(_ collectionNode: ASCollectionNode, didSelectItemAt indexPath: IndexPath) {
+        print("点击图片 \(indexPath)")
     }
     
     func galleryLayoutDelegate(_ delegate: ASCollectionGalleryLayoutDelegate, sizeForElements elements: ASElementMap) -> CGSize {
