@@ -25,18 +25,21 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         imagesCount = numberOfImages
         
         iconNode.style.preferredSize = CGSize(width: 40.auto(), height: 40.auto())
-        iconNode.image = UIImage.image(named: "logo", in: Bundle(for: HomeGraphicCell.self))
+        iconNode.cornerRadius = 4
+        iconNode.clipsToBounds = true
+        iconNode.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
+        iconNode.setURL(URL(string: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1598532482335&di=0d5afbdafe006a8c3d42191794afd8b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%3D580%2Fsign%3D0241830ebe014a90813e46b599763971%2F6d2aaa4bd11373f09e545323a30f4bfbfaed048f.jpg"), resetToDefault: true)
         addSubnode(iconNode)
         
         nameNode.attributedText = NSAttributedString(string: "一刀一个小朋友",
-                                                     attributes: [.font : UIFont.systemFont(ofSize: 15),
-                                                                  .foregroundColor : UIColor.color(hexNumber: 0xFF7D25)])
+                                                     attributes: [.font : UIFont.boldSystemFont(ofSize: 15),
+                                                                  .foregroundColor : UIColor.color(hexNumber: 0x33328B)])
         addSubnode(nameNode)
         
         
         timeNode.style.flexGrow = 0
         timeNode.attributedText = NSAttributedString(string: "1小时前",
-                                                     attributes: [.font : UIFont.systemFont(ofSize: 12),
+                                                     attributes: [.font : UIFont.systemFont(ofSize: 13),
                                                                   .foregroundColor : UIColor.color(hexNumber: 0x777777)])
         addSubnode(timeNode)
         
@@ -97,7 +100,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         
         // 内容 - 图片(图片个数对应的算法)
-        var width = 0.0
+        var width = Double(UIScreen.main.bounds.size.width - 80/*左右间距和*/)
         var height = 0.0
         switch imagesCount {
         case 0:
@@ -106,11 +109,11 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
             height = Double(arc4random_uniform(50) + 160)
             width = Double(arc4random_uniform(50) + 120)
         case 4:
-            height = Double(UIScreen.main.bounds.size.width - 70/*左右间距和*/ - 5*2/*内边距*/) / 3 * 2 + 5/*内边距*/
+            height = (width - 5*2/*内边距*/) / 3 * 2 + 5/*内边距*/
             width = height
         default:
             let row = imagesCount/3 + (imagesCount % 3 > 0 ? 1 : 0)
-            height = Double(UIScreen.main.bounds.size.width - 70/*左右间距和*/ - 5*2/*内边距*/) / 3 * Double(row) + Double((row - 1) * 5/*内边距*/)
+            height = (width - 5*2/*内边距*/) / 3 * Double(row) + Double((row - 1) * 5/*内边距*/)
         }
         imagesNode.style.preferredSize = CGSize(width: width, height: height)
         
