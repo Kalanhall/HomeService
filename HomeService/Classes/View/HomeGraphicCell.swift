@@ -25,7 +25,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
 
         selectionStyle = .none
         
-        iconNode.style.preferredSize = CGSize(width: 40.auto(), height: 40.auto())
+        iconNode.style.preferredSize = CGSize(width: 42.auto(), height: 42.auto())
         iconNode.cornerRadius = 4
         iconNode.clipsToBounds = true
         iconNode.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
@@ -53,17 +53,20 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         addSubnode(lineNode)
         
         timeNode.attributedText = NSAttributedString(string: "1小时前",
-                                                     attributes: [.font : UIFont.systemFont(ofSize: 13),
-                                                                  .foregroundColor : UIColor.color(hexNumber: 0x777777)])
+                                                     attributes: [.font : UIFont.systemFont(ofSize: 11),
+                                                                  .foregroundColor : UIColor.color(hexNumber: 0x999999)])
         iconNode.setURL(URL(string: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1598532482335&di=0d5afbdafe006a8c3d42191794afd8b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%3D580%2Fsign%3D0241830ebe014a90813e46b599763971%2F6d2aaa4bd11373f09e545323a30f4bfbfaed048f.jpg"), resetToDefault: true)
         nameNode.attributedText = NSAttributedString(string: "微信朋友圈",
                                                      attributes: [.font : UIFont.boldSystemFont(ofSize: 16),
                                                                   .foregroundColor : UIColor.color(hexNumber: 0x576B95)])
-        textNode.attributedText = NSAttributedString(string: "时间会说明一切时间会说明时间会说明一切时间会说明时间会说明一切时间会说明时间会说明一切时间会说明",
-                                                    attributes: [.font : UIFont.systemFont(ofSize: 14),
-                                                                 .foregroundColor : UIColor.color(hexNumber: 0x000000)])
-        imagesCount = Int(arc4random_uniform(10))
         
+        imagesCount = Int(arc4random_uniform(10))
+        let result = arc4random() % 2
+        if result > 0 || imagesCount == 0 {
+            textNode.attributedText = NSAttributedString(string: "时间会说明一切时间会说明时间会说明一切时间会说明时间会说明一切时间会说明时间会说明一切时间会说明",
+                                                         attributes: [.font : UIFont.systemFont(ofSize: 14),
+                                                                      .foregroundColor : UIColor.color(hexNumber: 0x000000)])
+        }
     }
     
     override func didLoad() {
@@ -94,7 +97,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         case 1:
             return CGSize(width: imagesNode.frame.size.height * (120 / 160)/*图片宽高比*/, height: imagesNode.frame.size.height)
         default:
-            let size = (Int(imagesNode.frame.size.width) - (imagesCount == 4 ? 1 : 2) * 5/*内边距*/) / (imagesCount == 4 ? 2 : 3)
+            let size = (Int(imagesNode.frame.size.width) - (imagesCount == 4 ? 1 : 3) * 5/*内边距*/) / (imagesCount == 4 ? 2 : 3)
             return CGSize(width: size, height: size)
         }
     }
@@ -112,8 +115,8 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         
         // 内容 - 图片(图片个数对应的算法)
         if imagesCount > 0 {
-            var width = Double(UIScreen.main.bounds.size.width - 60 * 2/*左间距+右间距*/)
-            let itemWidth = (width - 5*2/*内边距*/) / 3
+            var width = Double(UIScreen.main.bounds.size.width - 62.auto() * 2/*左间距+右间距*/)
+            let itemWidth = (width - 5*3/*内边距*/) / 3
             var height = 0.0
             let row = imagesCount/3 + (imagesCount % 3 > 0 ? 1 : 0)
             height = itemWidth * Double(row) + Double((row - 1) * 5/*内边距*/)
@@ -124,8 +127,9 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
                 width = height
             }
             imagesNode.style.preferredSize = CGSize(width: width, height: height)
-            editNode.style.preferredSize = CGSize(width: 44, height: 28)
         }
+        
+        editNode.style.preferredSize = CGSize(width: 44, height: 28)
         
         let bottomLayout = ASStackLayoutSpec.horizontal()
         bottomLayout.justifyContent = .spaceBetween
@@ -156,10 +160,10 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         let contentLayout = ASStackLayoutSpec.vertical()
         contentLayout.justifyContent = .start
         contentLayout.alignItems = .stretch
-        contentLayout.children = [ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 5, right: 10), child: topLayout), lineNode]
+        contentLayout.children = [ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 7, right: 10), child: topLayout), lineNode]
         
-        nameNode.style.spacingBefore = 5
-        textNode.style.spacingBefore = 5
+        nameNode.style.spacingBefore = 4
+        textNode.style.spacingBefore = 6
         imagesNode.style.spacingBefore = 10
         bottomLayout.style.spacingBefore = 7
         
