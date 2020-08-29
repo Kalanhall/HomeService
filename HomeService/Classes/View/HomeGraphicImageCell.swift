@@ -23,6 +23,6 @@ class HomeGraphicImageCell: ASCellNode {
     }
 
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        return ASInsetLayoutSpec(insets: .zero, child: imageNode)
+        return ASWrapperLayoutSpec(layoutElement: imageNode)
     }
 }
