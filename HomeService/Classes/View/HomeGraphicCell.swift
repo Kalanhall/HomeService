@@ -11,13 +11,63 @@ import Extensions
 
 class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource, ASCollectionGalleryLayoutPropertiesProviding {
 
-    let iconNode = ASNetworkImageNode()
-    let nameNode = ASTextNode()
-    let textNode = ASTextNode()
-    var imagesNode: ASCollectionNode!
-    let timeNode = ASTextNode()
-    let editNode = ASButtonNode()
-    let lineNode = ASTextNode()
+    lazy var iconNode: ASNetworkImageNode = {
+        let icon = ASNetworkImageNode()
+        icon.style.preferredSize = CGSize(width: 42.auto(), height: 42.auto())
+        icon.cornerRadius = 4
+        icon.clipsToBounds = true
+        icon.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
+        return icon
+    }()
+    lazy var nameNode: ASTextNode = {
+        return ASTextNode()
+    }()
+    lazy var textNode: ASTextNode = {
+        return ASTextNode()
+    }()
+    lazy var imagesNode: ASCollectionNode = {
+        let delegate = ASCollectionGalleryLayoutDelegate(scrollableDirections: ASScrollDirectionVerticalDirections)
+        let imagesView = ASCollectionNode(layoutDelegate: delegate, layoutFacilitator: nil)
+        imagesView.showsVerticalScrollIndicator = false
+        imagesView.delegate = self
+        imagesView.dataSource = self
+        
+        DispatchQueue.main.async {
+            // 必须主线程设置
+            delegate.propertiesProvider = self
+        }
+        
+        return imagesView
+    }()
+    lazy var addressNode: ASButtonNode = {
+        let address = ASButtonNode()
+        address.style.spacingBefore = 5
+        return address
+    }()
+    lazy var timeNode: ASTextNode = {
+        return ASTextNode()
+    }()
+    lazy var editNode: ASButtonNode = {
+        let edit = ASButtonNode()
+        edit.cornerRadius = 5
+        edit.clipsToBounds = true
+        edit.setImage(UIImage.image(named: "more", in: Bundle(for: HomeGraphicCell.self)), for: .normal)
+        edit.style.preferredSize = CGSize(width: 44, height: 28)
+        return edit
+    }()
+    lazy var likeCommentNode: LikeCommentNode = {
+        let likeComment = LikeCommentNode()
+        likeComment.style.alignSelf = .stretch
+        likeComment.cornerRadius = 4
+        likeComment.clipsToBounds = true
+        return likeComment
+    }()
+    lazy var lineNode: ASTextNode = {
+        let line = ASTextNode()
+        line.backgroundColor = UIColor.color(hexNumber: 0xE3E3E3)
+        line.style.maxHeight = ASDimension(unit:.points, value: 0.5)
+        return line
+    }()
     var imagesCount: Int = 0
 
     override init() {
@@ -25,33 +75,23 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
 
         selectionStyle = .none
         
-        iconNode.style.preferredSize = CGSize(width: 42.auto(), height: 42.auto())
-        iconNode.cornerRadius = 4
-        iconNode.clipsToBounds = true
-        iconNode.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
         addSubnode(iconNode)
-
         addSubnode(nameNode)
         addSubnode(textNode)
-
-        let delegate = ASCollectionGalleryLayoutDelegate(scrollableDirections: ASScrollDirectionVerticalDirections)
-        imagesNode = ASCollectionNode(layoutDelegate: delegate, layoutFacilitator: nil)
-        imagesNode.showsVerticalScrollIndicator = false
-        imagesNode.delegate = self
-        imagesNode.dataSource = self
         addSubnode(imagesNode)
-
+        addSubnode(addressNode)
         addSubnode(timeNode)
-
-        editNode.cornerRadius = 5
-        editNode.clipsToBounds = true
-        editNode.setImage(UIImage.image(named: "more", in: Bundle(for: HomeGraphicCell.self)), for: .normal)
         addSubnode(editNode)
-
-        lineNode.backgroundColor = UIColor.color(hexNumber: 0xE3E3E3)
-        lineNode.style.maxHeight = ASDimension(unit:.points, value: 0.5)
+        addSubnode(likeCommentNode)
         addSubnode(lineNode)
         
+        bindingData()
+    }
+    
+    func bindingData() {
+        addressNode.setAttributedTitle(NSAttributedString(string: "深圳·宝安区",
+                                                          attributes: [.font : UIFont.systemFont(ofSize: 12),
+                                                                       .foregroundColor : UIColor.color(hexNumber: 0x576B95)]), for: .normal)
         timeNode.attributedText = NSAttributedString(string: "1小时前",
                                                      attributes: [.font : UIFont.systemFont(ofSize: 11),
                                                                   .foregroundColor : UIColor.color(hexNumber: 0x999999)])
@@ -67,14 +107,9 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
                                                          attributes: [.font : UIFont.systemFont(ofSize: 14),
                                                                       .foregroundColor : UIColor.color(hexNumber: 0x000000)])
         }
-    }
-    
-    override func didLoad() {
-        super.didLoad()
-
-        // 这玩意必须在主线程
-        let delegate = imagesNode.layoutDelegate as! ASCollectionGalleryLayoutDelegate
-        delegate.propertiesProvider = self
+        likeCommentNode.likeNode.attributedText = NSAttributedString(string: "ෆ 非死不可",
+                                                     attributes: [.font : UIFont.boldSystemFont(ofSize: 14),
+                                                                  .foregroundColor : UIColor.color(hexNumber: 0x576B95)])
     }
     
     func collectionNode(_ collectionNode: ASCollectionNode, numberOfItemsInSection section: Int) -> Int {
@@ -113,7 +148,26 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
     // ASLayoutSpec
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         
-        // 内容 - 图片(图片个数对应的算法)
+        let bottomLayout = ASStackLayoutSpec.horizontal()
+        bottomLayout.justifyContent = .spaceBetween
+        bottomLayout.alignItems = .center
+        bottomLayout.style.alignSelf = .stretch // 嵌套太多，需要覆盖布局
+        bottomLayout.children = [timeNode, editNode]
+        
+        let rightLayout = ASStackLayoutSpec.vertical()
+        rightLayout.justifyContent = .start
+        rightLayout.alignItems = .start
+        rightLayout.style.flexShrink = 1
+        rightLayout.style.flexGrow = 1
+        
+        var flexbox: [ASLayoutElement] = []
+        // 添加昵称
+        flexbox.append(nameNode)
+        // 添加内容文本
+        if textNode.attributedText != nil {
+            flexbox.append(textNode)
+        }
+        // 添加内容图片
         if imagesCount > 0 {
             var width = Double(UIScreen.main.bounds.size.width - 62.auto() * 2/*左间距+右间距*/)
             let itemWidth = (width - 5*3/*内边距*/) / 3
@@ -127,46 +181,78 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
                 width = height
             }
             imagesNode.style.preferredSize = CGSize(width: width, height: height)
+            flexbox.append(imagesNode)
         }
-        
-        editNode.style.preferredSize = CGSize(width: 44, height: 28)
-        
-        let bottomLayout = ASStackLayoutSpec.horizontal()
-        bottomLayout.justifyContent = .spaceBetween
-        bottomLayout.alignItems = .center
-        bottomLayout.style.alignSelf = .stretch // 嵌套太多，需要覆盖布局
-        bottomLayout.children = [timeNode, editNode]
-        
-        let rightLayout = ASStackLayoutSpec.vertical()
-        rightLayout.justifyContent = .start
-        rightLayout.alignItems = .start
-        rightLayout.style.flexShrink = 1
-        rightLayout.style.flexGrow = 1
-        
-        if imagesCount > 0 && textNode.attributedText != nil {
-            rightLayout.children = [nameNode, textNode, imagesNode, bottomLayout]
-        } else if imagesCount > 0  {
-            rightLayout.children = [nameNode, imagesNode, bottomLayout]
-        } else if textNode.attributedText != nil {
-            rightLayout.children = [nameNode, textNode, bottomLayout]
+        // 添加定位地址
+        if addressNode.attributedTitle(for: .normal) != nil {
+            flexbox.append(addressNode)
         }
+        // 添加底部栏
+        flexbox.append(bottomLayout)
+        // 添加点赞行
+        if likeCommentNode.likeNode.attributedText != nil {
+            flexbox.append(likeCommentNode)
+        }
+        rightLayout.children = flexbox as! [ASLayoutElement]
         
         let topLayout = ASStackLayoutSpec.horizontal()
         topLayout.spacing = 10
         topLayout.justifyContent = .start
         topLayout.alignItems = .start
-        topLayout.children = [iconNode, rightLayout]
+        topLayout.children = [
+            iconNode,
+            rightLayout
+        ]
         
         let contentLayout = ASStackLayoutSpec.vertical()
         contentLayout.justifyContent = .start
         contentLayout.alignItems = .stretch
-        contentLayout.children = [ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 7, right: 10), child: topLayout), lineNode]
+        contentLayout.children = [
+            ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 7, right: 5), child: topLayout),
+            lineNode
+        ]
         
         nameNode.style.spacingBefore = 4
         textNode.style.spacingBefore = 6
         imagesNode.style.spacingBefore = 10
-        bottomLayout.style.spacingBefore = 7
+        bottomLayout.style.spacingBefore = 5
         
+        return contentLayout
+    }
+}
+
+class LikeCommentNode: ASDisplayNode {
+    lazy var likeNode: ASTextNode = {
+        let like = ASTextNode()
+        like.textContainerInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        return like
+    }()
+    lazy var commentNode: ASTableNode = {
+        let table = ASTableNode()
+        table.style.alignSelf = .stretch
+        table.backgroundColor = .clear
+        table.style.minHeight = ASDimension(unit: .points, value: 40)
+        table.contentInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        return table
+    }()
+    
+    override init() {
+        super.init()
+        backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
+        addSubnode(likeNode)
+        addSubnode(commentNode)
+    }
+    
+    override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        let contentLayout = ASStackLayoutSpec.vertical()
+        contentLayout.justifyContent = .start
+        contentLayout.alignItems = .start
+        contentLayout.style.flexShrink = 1
+        contentLayout.style.flexGrow = 1
+        contentLayout.children = [
+            likeNode,
+            commentNode
+        ]
         return contentLayout
     }
 }

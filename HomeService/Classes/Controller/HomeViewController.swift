@@ -32,19 +32,19 @@ class HomeViewController: UIViewController, JXSegmentedViewDelegate, JXSegmented
         
         let titles = ["最新", "热门", "打听", "吐槽", "公告"]
         // 配置指示器
-//        let indicator = JXSegmentedIndicatorLineView()
-//        indicator.indicatorWidth = JXSegmentedViewAutomaticDimension
-//        indicator.indicatorHeight = 2
-//        indicator.indicatorCornerRadius = 1
-//        indicator.verticalOffset = 5
-//        indicator.lineStyle = .lengthenOffset
-//        indicator.indicatorColor = UIColor.color(hexNumber: 0xFF2618)
-//        segmentedView.indicators = [indicator]
+        let indicator = JXSegmentedIndicatorLineView()
+        indicator.indicatorWidth = JXSegmentedViewAutomaticDimension
+        indicator.indicatorHeight = 2
+        indicator.indicatorCornerRadius = 1
+        indicator.verticalOffset = 5
+        indicator.lineStyle = .lengthenOffset
+        indicator.indicatorColor = UIColor.color(hexNumber: 0xFF2618)
+        segmentedView.indicators = [indicator]
         // 配置数据源
         let dataSource = JXSegmentedTitleDataSource()
         dataSource.titles = titles
         dataSource.itemSpacing = 20
-        dataSource.titleNormalFont = UIFont.boldSystemFont(ofSize: 17)
+        dataSource.titleNormalFont = UIFont.boldSystemFont(ofSize: 16)
         dataSource.isTitleColorGradientEnabled = true
         dataSource.isItemSpacingAverageEnabled = false
         dataSource.isTitleZoomEnabled = true
