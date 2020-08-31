@@ -58,7 +58,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
     }()
     var currentModel: CommentModel?
 
-    init(model: CommentModel?) {
+    init(model: CommentModel) {
         super.init()
         
         currentModel = model
@@ -128,7 +128,6 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
 
     // ASLayoutSpec
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        print(self.indexPath)
         let bottomLayout = ASStackLayoutSpec.horizontal()
         bottomLayout.justifyContent = .spaceBetween
         bottomLayout.alignItems = .center
@@ -187,6 +186,6 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         imagesNode.style.spacingBefore = 10
         bottomLayout.style.spacingBefore = 5
         
-        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 7, right: 5), child: contentLayout)
+        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 5, right: 10), child: contentLayout)
     }
 }

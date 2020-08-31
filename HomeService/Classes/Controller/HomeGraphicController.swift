@@ -18,6 +18,17 @@ class CommentModel: NSObject {
     var time: String?
     var likeList: [String]?
     var commentList: [String]?
+    
+    func commentRows() -> Int {
+        var rows: Int = 0
+        if likeList != nil  {
+            rows = rows + 1
+        }
+        if commentList != nil {
+            rows = rows + commentList!.count
+        }
+        return rows
+    }
 }
 
 class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSource {
@@ -72,42 +83,20 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
     
     func tableNode(_ tableNode: ASTableNode, numberOfRowsInSection section: Int) -> Int {
         let model = dataSource?[section]
-        var section: Int = 1
-        if model?.likeList != nil  {
-            section = section + 1
-        }
-        if model?.commentList != nil {
-            section = section + model!.commentList!.count
-        }
-        return section
+        return model!.commentRows() + 1
     }
     
     func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let model = dataSource?[indexPath.section]
         if indexPath.row == 0 {
             let block = { [weak self] () -> ASCellNode in
-                let cell = HomeGraphicCell(model: model)
+                let cell = HomeGraphicCell(model: model!)
                 return cell
             }
             return block
         } else {
-            var text = ""
-            if model?.likeList != nil && indexPath.row == 1 {
-                // 有点赞，则第一条显示点赞
-                text = "ෆ "
-                for (index, item) in model!.likeList!.enumerated() {
-                    text.append(item)
-                    if index != model!.likeList!.count - 1 {
-                        text.append("，")
-                    }
-                }
-            } else {
-                // 没有点赞，则全部为评论
-                text = model?.commentList?[(indexPath.row - 1 - (model!.likeList?.count ?? 0 > 0 ? 1 : 0))] as! String
-            }
             let block = { [weak self] () -> ASCellNode in
-                let cell = HomeTichTextCell(text: text)
-
+                let cell = HomeTichTextCell(model: model!)
                 return cell
             }
             return block
