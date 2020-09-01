@@ -56,7 +56,13 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         edit.style.preferredSize = CGSize(width: 44, height: 28)
         return edit
     }()
-    var currentModel: CommentModel?
+    lazy var botlineNode: ASDisplayNode = {
+        let lineNode = ASDisplayNode()
+        lineNode.backgroundColor = UIColor.color(hexNumber: 0xE2E2E2)
+        lineNode.style.minHeight = ASDimension(unit: .points, value: 0.5)
+        return lineNode
+    }()
+    var currentModel: CommentModel!
 
     init(model: CommentModel) {
         super.init()
@@ -71,6 +77,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         addSubnode(addressNode)
         addSubnode(timeNode)
         addSubnode(editNode)
+        addSubnode(botlineNode)
         
         bindingData()
     }
@@ -186,6 +193,18 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         imagesNode.style.spacingBefore = 10
         bottomLayout.style.spacingBefore = 5
         
-        return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 5, right: 10), child: contentLayout)
+        if currentModel.likeList == nil && currentModel.commentList == nil {
+            let resultLayout = ASStackLayoutSpec.vertical()
+            resultLayout.spacing = 0
+            resultLayout.justifyContent = .start
+            resultLayout.alignItems = .stretch
+            resultLayout.children = [
+                ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 5, right: 10), child: contentLayout),
+                botlineNode
+            ]
+            return resultLayout
+        } else {
+            return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 10, left: 10, bottom: 5, right: 10), child: contentLayout)
+        }
     }
 }

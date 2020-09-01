@@ -9,7 +9,24 @@ import UIKit
 import AsyncDisplayKit
 
 class HomeTichTextCell: ASCellNode {
-    let textNode = ASTextNode()
+    lazy var textNode: ASTextNode = {
+        let textNode = ASTextNode()
+        textNode.textContainerInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+        textNode.backgroundColor = UIColor.color(hexNumber: 0xF7F7F7)
+        return textNode
+    }()
+    lazy var toplineNode: ASDisplayNode = {
+        let lineNode = ASDisplayNode()
+        lineNode.backgroundColor = UIColor.color(hexNumber: 0xE5E5E5)
+        lineNode.style.minHeight = ASDimension(unit: .points, value: 0.5)
+        return lineNode
+    }()
+    lazy var botlineNode: ASDisplayNode = {
+        let lineNode = ASDisplayNode()
+        lineNode.backgroundColor = UIColor.color(hexNumber: 0xE2E2E2)
+        lineNode.style.minHeight = ASDimension(unit: .points, value: 0.5)
+        return lineNode
+    }()
     var currentModel: CommentModel!
     
     init(model: CommentModel) {
@@ -17,10 +34,9 @@ class HomeTichTextCell: ASCellNode {
         currentModel = model
         
         selectionStyle = .none
-        textNode.textContainerInset = UIEdgeInsets(top: 0, left: 10, bottom: 5, right: 10)
-        textNode.backgroundColor = UIColor.color(hexNumber: 0xF7F7F7)
         addSubnode(textNode)
-        
+        addSubnode(toplineNode)
+        addSubnode(botlineNode)
     }
 
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
@@ -46,10 +62,15 @@ class HomeTichTextCell: ASCellNode {
                                                                   .paragraphStyle : para,
                                                                   .foregroundColor : UIColor.color(hexNumber: 0x000000)])
         
+        
+        let contentLayout = ASStackLayoutSpec.vertical()
+        contentLayout.spacing = 0
+        contentLayout.justifyContent = .start
+        contentLayout.alignItems = .stretch
+        
         var edgeInsets: UIEdgeInsets!
         if indexPath?.row == 1 { // 第一条
-            textNode.textContainerInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
-            if currentModel.likeList?.isEmpty == false {
+            if currentModel.likeList != nil {
                 textNode.attributedText = NSAttributedString(string: text,
                                                              attributes: [.font : UIFont.boldSystemFont(ofSize: 13),
                                                                           .paragraphStyle : para,
@@ -58,9 +79,23 @@ class HomeTichTextCell: ASCellNode {
         }
         if indexPath?.row == currentModel.commentRows() { // 最后一条
             edgeInsets = UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 10, right: 10)
+            contentLayout.children = [
+                ASInsetLayoutSpec(insets: edgeInsets, child: textNode),
+                botlineNode
+            ]
+            return contentLayout
         } else {
             edgeInsets = UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 0, right: 10)
         }
+        
+        if (currentModel.likeList != nil && currentModel.commentList != nil) && indexPath?.row == 2 {
+            contentLayout.children = [
+                ASInsetLayoutSpec(insets: UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 0, right: 10), child: toplineNode),
+                ASInsetLayoutSpec(insets: edgeInsets, child: textNode)
+            ]
+            return contentLayout
+        }
+        
         return ASInsetLayoutSpec(insets: edgeInsets, child: textNode)
     }
 }
