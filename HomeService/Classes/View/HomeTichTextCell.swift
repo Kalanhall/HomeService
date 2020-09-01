@@ -50,9 +50,9 @@ class HomeTichTextCell: ASCellNode {
                     text.append("，")
                 }
             }
-        } else {
+        } else if currentModel.commentList != nil {
             // 没有点赞，则全部为评论
-            text = currentModel.commentList?[((indexPath?.row ?? 0) - 1 - (currentModel.likeList?.isEmpty == true ? 0 : 1))] as! String
+            text = currentModel.commentList?[((indexPath?.row ?? 0) - 1 - (currentModel.likeList == nil ? 0 : 1))] as! String
         }
         
         let para = NSMutableParagraphStyle()

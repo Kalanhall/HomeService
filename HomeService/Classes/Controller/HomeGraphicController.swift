@@ -32,7 +32,6 @@ class CommentModel: NSObject {
 }
 
 class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSource {
-    
     var controllerIndex = 0
     var dataSource: [CommentModel]? = []
     
@@ -55,11 +54,6 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.addSubnode(tableNode)
-        tableNode.view.snp_makeConstraints { (make) in
-            make.edges.equalToSuperview()
-        }
-        
         for item in 0...9 {
             let model = CommentModel()
             model.iconURL = "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1598532482335&di=0d5afbdafe006a8c3d42191794afd8b9&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fforum%2Fw%3D580%2Fsign%3D0241830ebe014a90813e46b599763971%2F6d2aaa4bd11373f09e545323a30f4bfbfaed048f.jpg"
@@ -71,9 +65,14 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
             model.address = "深圳·宝安区·财富港大厦"
             model.time = "1小时前 Wechat"
             model.likeList = ["非死不可1", "非死不可2","非死不可3","非死不可4","FackBook~"]
-            model.commentList = ["非死不可：这是一条评论", "FackBook回复非死不可：这是第二条评论"]
+            model.commentList = ["非死不可：这是一条评论", "FackBook回复非死不可：这是第2条评论这是第2条评论这是第2条评论", "非死不可回复FackBook：这是第3条评论这是第3条评论这是第3条评论"]
             
-            dataSource?.append(model)
+            self.dataSource?.append(model)
+        }
+        
+        view.addSubnode(tableNode)
+        tableNode.view.snp_makeConstraints { (make) in
+            make.edges.equalToSuperview()
         }
     }
     

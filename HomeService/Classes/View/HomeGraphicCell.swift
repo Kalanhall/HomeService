@@ -10,7 +10,7 @@ import AsyncDisplayKit
 import Extensions
 
 class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource, ASCollectionGalleryLayoutPropertiesProviding {
-
+    
     lazy var iconNode: ASNetworkImageNode = {
         let icon = ASNetworkImageNode()
         icon.style.preferredSize = CGSize(width: 42.auto(), height: 42.auto())
