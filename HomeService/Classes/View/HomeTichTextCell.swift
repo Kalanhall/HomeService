@@ -17,20 +17,10 @@ class HomeTichTextCell: ASCellNode {
         currentModel = model
         
         selectionStyle = .none
-        
+        textNode.textContainerInset = UIEdgeInsets(top: 0, left: 10, bottom: 5, right: 10)
         textNode.backgroundColor = UIColor.color(hexNumber: 0xF7F7F7)
-        textNode.textContainerInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
         addSubnode(textNode)
         
-    }
-    
-    func bindingData(string: String) {
-        let para = NSMutableParagraphStyle()
-        para.lineSpacing = 2
-        textNode.attributedText = NSAttributedString(string: string,
-                                                     attributes: [.font : UIFont.boldSystemFont(ofSize: 14),
-                                                                  .paragraphStyle : para,
-                                                                  .foregroundColor : UIColor.color(hexNumber: 0x576B95)])
     }
 
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
@@ -48,18 +38,25 @@ class HomeTichTextCell: ASCellNode {
             // 没有点赞，则全部为评论
             text = currentModel.commentList?[((indexPath?.row ?? 0) - 1 - (currentModel.likeList?.isEmpty == true ? 0 : 1))] as! String
         }
-        bindingData(string: text)
+        
+        let para = NSMutableParagraphStyle()
+        para.lineSpacing = 2
+        textNode.attributedText = NSAttributedString(string: text,
+                                                     attributes: [.font : UIFont.boldSystemFont(ofSize: 13),
+                                                                  .paragraphStyle : para,
+                                                                  .foregroundColor : UIColor.color(hexNumber: 0x000000)])
         
         var edgeInsets: UIEdgeInsets!
         if indexPath?.row == 1 { // 第一条
-            textNode.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
-            textNode.clipsToBounds = true
-            textNode.cornerRadius = 4
+            textNode.textContainerInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
+            if currentModel.likeList?.isEmpty == false {
+                textNode.attributedText = NSAttributedString(string: text,
+                                                             attributes: [.font : UIFont.boldSystemFont(ofSize: 13),
+                                                                          .paragraphStyle : para,
+                                                                          .foregroundColor : UIColor.color(hexNumber: 0x576B95)])
+            }
         }
         if indexPath?.row == currentModel.commentRows() { // 最后一条
-            textNode.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-            textNode.clipsToBounds = true
-            textNode.cornerRadius = 4
             edgeInsets = UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 10, right: 10)
         } else {
             edgeInsets = UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 0, right: 10)
