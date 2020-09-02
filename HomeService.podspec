@@ -49,4 +49,6 @@ TODO: Add long description of the pod here.
   # - 视图类
   s.dependency 'HBDNavigationBar'
   s.dependency 'JXSegmentedView'
+  s.dependency 'JXPhotoBrowser'
+  s.dependency 'Kingfisher'
 end

@@ -70,6 +70,11 @@ class HomeTichTextCell: ASCellNode {
         
         var edgeInsets: UIEdgeInsets!
         if indexPath?.row == 1 { // 第一条
+//            if #available(iOS 11.0, *) {
+//                textNode.cornerRadius = 5
+//                textNode.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+//                textNode.clipsToBounds = true
+//            }
             if currentModel.likeList != nil {
                 textNode.attributedText = NSAttributedString(string: text,
                                                              attributes: [.font : UIFont.boldSystemFont(ofSize: 13),
@@ -78,6 +83,11 @@ class HomeTichTextCell: ASCellNode {
             }
         }
         if indexPath?.row == currentModel.commentRows() { // 最后一条
+//            if #available(iOS 11.0, *) {
+//                textNode.cornerRadius = 5
+//                textNode.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+//                textNode.clipsToBounds = true
+//            }
             edgeInsets = UIEdgeInsets(top: 0, left: 42.auto()+20, bottom: 10, right: 10)
             contentLayout.children = [
                 ASInsetLayoutSpec(insets: edgeInsets, child: textNode),

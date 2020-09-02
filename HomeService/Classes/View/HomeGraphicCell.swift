@@ -8,13 +8,15 @@
 import UIKit
 import AsyncDisplayKit
 import Extensions
+import JXPhotoBrowser
+import Kingfisher
 
 class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource, ASCollectionGalleryLayoutPropertiesProviding {
     
     lazy var iconNode: ASNetworkImageNode = {
         let icon = ASNetworkImageNode()
         icon.style.preferredSize = CGSize(width: 42.auto(), height: 42.auto())
-        icon.cornerRadius = 4
+        icon.cornerRadius = 5
         icon.clipsToBounds = true
         icon.backgroundColor = UIColor.color(hexNumber: 0xF9F9F9)
         return icon
@@ -59,9 +61,10 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
     lazy var botlineNode: ASDisplayNode = {
         let lineNode = ASDisplayNode()
         lineNode.backgroundColor = UIColor.color(hexNumber: 0xE2E2E2)
-        lineNode.style.minHeight = ASDimension(unit: .points, value: 0.5)
+        lineNode.style.minHeight = ASDimensionMake(0.5)
         return lineNode
     }()
+    
     var currentModel: CommentModel!
 
     init(model: CommentModel) {
@@ -107,12 +110,38 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         let cell = HomeGraphicImageCell()
         let url = currentModel?.images?[indexPath.row] ?? ""
         cell.imageNode.setURL(URL(string: url), resetToDefault: true)
-        
         return cell
     }
     
     func collectionNode(_ collectionNode: ASCollectionNode, didSelectItemAt indexPath: IndexPath) {
         print("点击图片 \(indexPath)")
+        let browser = JXPhotoBrowser()
+        browser.numberOfItems = { [weak self] in
+            self?.currentModel.images?.count ?? 0
+        }
+        browser.reloadCellAtIndex = { [weak self] context in
+            let cell = context.cell as? JXPhotoBrowserImageCell
+            let indexPath = IndexPath(item: context.index, section: indexPath.section)
+            if let url = self?.currentModel?.images?[indexPath.row] {
+                cell?.imageView.kf.setImage(with:  ImageResource(downloadURL: URL(string: url)!), placeholder: nil, options: .none, completionHandler: { (image, error, type, imageurl) in
+                    cell?.setNeedsLayout()
+                })
+            }
+        }
+        browser.transitionAnimator = JXPhotoBrowserSmoothZoomAnimator(transitionViewAndFrame: { (index, destinationView) -> JXPhotoBrowserSmoothZoomAnimator.TransitionViewAndFrame? in
+            let path = IndexPath(item: index, section: indexPath.section)
+            guard let cell: HomeGraphicImageCell = collectionNode.nodeForItem(at: path) as! HomeGraphicImageCell else {
+                return nil
+            }
+            let image = cell.imageNode.image
+            let transitionView = UIImageView(image: image)
+            transitionView.contentMode = cell.imageNode.contentMode
+            transitionView.clipsToBounds = true
+            let thumbnailFrame = cell.imageNode.view.convert(cell.imageNode.bounds, to: destinationView)
+            return (transitionView, thumbnailFrame)
+        })
+        browser.pageIndex = indexPath.item
+        browser.show(method: .present(fromVC: nil, embed: nil))
     }
     
     func galleryLayoutDelegate(_ delegate: ASCollectionGalleryLayoutDelegate, sizeForElements elements: ASElementMap) -> CGSize {
@@ -120,7 +149,7 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
         case 1:
             return CGSize(width: imagesNode.frame.size.height * (120 / 160)/*图片宽高比*/, height: imagesNode.frame.size.height)
         default:
-            let size = (Int(imagesNode.frame.size.width) - (currentModel?.images?.count == 4 ? 1 : 3) * 5/*内边距*/) / (currentModel?.images?.count == 4 ? 2 : 3)
+            let size = (Int(imagesNode.frame.size.width) - 3 * 5/*内边距*/) / 3
             return CGSize(width: size, height: size)
         }
     }
@@ -155,18 +184,17 @@ class HomeGraphicCell: ASCellNode, ASCollectionDelegate, ASCollectionDataSource,
             flexbox.append(textNode)
         }
         // 添加内容图片
-        if currentModel?.images?.isEmpty == false {
-            let count = currentModel?.images!.count ?? 0
+        if currentModel?.images != nil && currentModel?.images?.isEmpty == false {
+            let count = currentModel!.images!.count
             var width = Double(UIScreen.main.bounds.size.width - 62.auto() * 2/*左间距+右间距*/)
-            let itemWidth = (width - 5*3/*内边距*/) / 3
-            var height = 0.0
             let row = count/3 + (count % 3 > 0 ? 1 : 0)
-            height = itemWidth * Double(row) + Double((row - 1) * 5/*内边距*/)
-            let imageH = width / (120 / 160)
+            let itemWidth = (width - 5*3/*内边距*/) / 3
+            var height = itemWidth * Double(row) + Double((row - 1) * 5/*内边距*/)
             if currentModel?.images?.count == 1 {
+                let imageH = width / (120 / 160)
                 height = imageH < width ? imageH : width
-            } else if currentModel?.images?.count == 4 {
-                width = height
+            } else if currentModel.images?.count == 4 {
+                imagesNode.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: CGFloat(itemWidth))
             }
             imagesNode.style.preferredSize = CGSize(width: width, height: height)
             flexbox.append(imagesNode)

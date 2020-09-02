@@ -102,9 +102,4 @@ class HomeGraphicController: JXSegmentController, ASTableDelegate, ASTableDataSo
         }
     }
     
-    func tableNode(_ tableNode: ASTableNode, didSelectRowAt indexPath: IndexPath) {
-        tableNode.deselectRow(at: indexPath, animated: true)
-   
-    }
-    
 }
